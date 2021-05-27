@@ -13,7 +13,7 @@ import {
 } from '@patternfly/react-core';
 import { routes, IAppRoute, IAppRouteGroup } from '@app/routes';
 import logo from '@app/bgimages/icons8-softether-vpn.svg';
-import { userGlobal } from '@app/index'
+import { userGlobal } from '@app/index';
 
 interface IAppLayout {
   children: React.ReactNode;

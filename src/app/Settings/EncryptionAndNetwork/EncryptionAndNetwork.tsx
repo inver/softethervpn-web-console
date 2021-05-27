@@ -14,23 +14,34 @@ import { SyslogCard } from '@app/Settings/EncryptionAndNetwork/SyslogSend';
 import { KeepAliveCard } from '@app/Settings/EncryptionAndNetwork/KeepAlive';
 import { AdminPasswordCard } from '@app/Settings/EncryptionAndNetwork/AdminPassword';
 import { IcmpDnsCard } from '@app/Settings/EncryptionAndNetwork/VpnIcmpDns';
+import { isBridgeMode, userGlobal, isV4 } from '@app/index';
 
 const EncryptionNetwork: React.FunctionComponent = () => (
   <PageSection>
   <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }} spaceItems={{ modifier: 'spaceItemsXl' }}>
 
   <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
-  <FlexItem>
-    <ServerEncryptionCard />
-  </FlexItem>
+  { userGlobal === "Hub Administrator" ?
+    <div/>
+    :
+    <FlexItem>
+      <ServerEncryptionCard />
+    </FlexItem>
+  }
   <FlexItem>
     <ServerCertificateCard />
   </FlexItem>
+  { userGlobal === "Hub Administrator" ?
+    <div/>
+    :
   <FlexItem>
     <SyslogCard />
   </FlexItem>
+  }
   </Flex>
-
+  { userGlobal === "Hub Administrator" ?
+    <div/>
+    :
   <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
   <FlexItem>
     <KeepAliveCard />
@@ -38,10 +49,13 @@ const EncryptionNetwork: React.FunctionComponent = () => (
   <FlexItem>
     <AdminPasswordCard />
   </FlexItem>
-  <FlexItem>
-    <IcmpDnsCard />
-  </FlexItem>
+  { isBridgeMode || !isV4  ? <div/> :
+    <FlexItem>
+      <IcmpDnsCard />
+    </FlexItem>
+  }
   </Flex>
+  }
 
   </Flex>
   </PageSection>

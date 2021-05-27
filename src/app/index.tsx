@@ -11,6 +11,23 @@ import { BackgroundImage } from '@patternfly/react-core';
 export let userGlobal = "";
 export let ddnsGlobal = "";
 export let azureGlobal = "";
+export let capsListGlobal = [];
+export let isTapSupported: boolean;
+export let isBridgeMode: boolean;
+export let isV4: boolean;
+
+function deleteLabel(label: string)
+{
+  routes.forEach(route => {
+    if(isIAppRouteGroup(route)){
+      route.routes.forEach(subroute => {
+        if(subroute.label == label){
+          delete subroute["label"];
+        }
+      })
+    }
+  });
+}
 
 class LoadingPageBackground extends React.Component {
   constructor(props) {
@@ -58,7 +75,12 @@ const LoadingPage: React.FunctionComponent = () => (
 class SoftetherRouter extends React.Component {
   constructor(props){
     super(props);
-    this.state = { loadingAdmin: true, loadingCluster: true, loadigDDNS: true, loadingAzure:true, user: "Administrator" };
+    this.state = {
+      loadingAdmin: true,
+      loadingCluster: true,
+      loadigDDNSAzure: true,
+      loadingCaps: true,
+    };
   }
 
   componentDidMount(){
@@ -78,15 +100,14 @@ class SoftetherRouter extends React.Component {
                 }
               });
             }
-            else{
-              if(route.isAdmin === true){
-                delete route["label"];
-              }
+            if(route.isAdmin === true){
+              delete route["label"];
             }
           });
       }
-    userGlobal = "Hub Administrator"
+      userGlobal = "Hub Administrator";
       this.setState({ loadingAdmin: false, user: "Hub Administrator"});
+      console.log(error)
     });
 
     api.GetFarmSetting()
@@ -137,27 +158,72 @@ class SoftetherRouter extends React.Component {
         if(response.IsEnabled_bool){
           azureGlobal = ag.concat(".vpnazure.net");
         }
-        this.setState({ loadigDDNS: false, loadingAzure: false });
+        this.setState({ loadigDDNSAzure: false });
         // console.log(azureGlobal)
         // console.log(ddnsGlobal)
       })
       .catch( error => {
-        this.setState({ loadigDDNS: false, loadingAzure: false });
+        this.setState({ loadigDDNSAzure: false });
+        console.log(error)
       });
 
     })
     .catch( error => {
-      this.setState({ loadigDDNS: false, loadingAzure: false });
+      this.setState({ loadigDDNSAzure: false });
+      console.log(error)
+    });
+
+    api.GetCaps()
+    .then( response => {
+      capsListGlobal = response.CapsList;
+      isTapSupported = response.caps_b_tap_supported_u32 == 1;// assign isTapSupported
+      isBridgeMode = response.caps_b_bridge_u32 == 1;
+      isV4 = response.caps_b_vpn4_u32 == 1;
+
+      // hide local bridge functionality
+      if(response.caps_b_local_bridge_u32 != 1){
+        deleteLabel("Local Bridge")
+      }
+
+      // hide cluster functionality
+      if(response.caps_b_support_cluster_u32 != 1){
+        deleteLabel("Clustering Configuration")
+      }
+
+      if(isBridgeMode){
+        routes.forEach(route => {
+            if(isIAppRouteGroup(route)){
+              route.routes.forEach(subroute => {
+                if(subroute.isBridge === true){
+                  delete subroute["label"];
+                }
+              });
+            }
+            else{
+              if(route.isBridge === true){
+                delete route["label"];
+              }
+            }
+          });
+      }
+
+      this.setState({ loadingCaps: false });
+    })
+    .catch( error => {
+      console.log(error)
+      this.setState({ loadingCaps: false });
     });
   } // componentDidMount
 
+
   render(){
-    const { loadingAdmin, loadingCluster, loadigDDNS, loadigAzure, user} = this.state;
+    const { loadingAdmin, loadingCluster, loadigDDNSAzure, loadingCaps} = this.state;
+    const loading = loadingAdmin || loadingCluster || loadigDDNSAzure || loadingCaps;
 
 
     return (
       <React.Fragment>
-      { loadingAdmin || loadingCluster || loadigDDNS || loadigAzure ? <LoadingPage /> :
+      { loading ? <LoadingPage /> :
       <AppLayout>
         <AppRoutes />
       </AppLayout>}

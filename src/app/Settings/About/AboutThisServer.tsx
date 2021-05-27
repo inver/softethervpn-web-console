@@ -5,6 +5,7 @@ import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { split_string_by_capitalization, mode_to_string } from '@app/utils/string_utils';
 import { api } from '@app/utils/vpnrpc_settings';
+import { capsListGlobal } from '@app/index';
 
 const loading_rows = [
       {
@@ -59,10 +60,10 @@ class AboutThisServerTable extends React.Component {
         }
         rows.push({cells: [split_string_by_capitalization(key), value], props: { colSpan: 8 }})
       });
-      api.GetCaps().then( response => {
+      
         let tail = []
 
-        response.CapsList.forEach(cap => {
+        capsListGlobal.forEach(cap => {
           let capval = cap.CapsValue_u32;
 
           if(capval === 1){
@@ -85,9 +86,6 @@ class AboutThisServerTable extends React.Component {
         });
         rows = rows.concat(tail);
         this.setState({ loading: false, rows: rows });
-      }).catch( error => {
-        console.log(error)
-      });
     }).catch( error => {
       console.log(error)
     });

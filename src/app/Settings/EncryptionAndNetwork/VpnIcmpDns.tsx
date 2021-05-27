@@ -73,8 +73,6 @@ class IcmpDnsCard extends React.Component {
     };
   }
 
-  componentDidMount(){
-  }
 
   render(){
     const { loading, isModalOpen, icmp, dns } = this.state;

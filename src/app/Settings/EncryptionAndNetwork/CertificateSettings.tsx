@@ -27,7 +27,7 @@ import * as x509 from "../../../../node_modules/@peculiar/x509";
 import { crt_field2object } from '@app/utils/string_utils';
 import { ViewCertModal } from '@app/CertificateViewer/CertificateViewer';
 import { downloadBlob } from '@app/utils/blob_utils';
-import { ddnsGlobal } from '@app/index'
+import { ddnsGlobal, userGlobal } from '@app/index';
 
 function formatKey(key: string): strings
 {
@@ -213,7 +213,7 @@ class ServerCertificateCard extends React.Component {
       }
       else{
         let certificate = new x509.X509Certificate(response.Cert_bin);
-        cn = rt_field2object(certificate.subject)["CN"];
+        cn = crt_field2object(certificate.subject)["CN"];
       }
 
       this.setState({
@@ -255,10 +255,12 @@ class ServerCertificateCard extends React.Component {
 
     if(certBin != ""){
       let cert = new x509.X509Certificate(certBin);
-
-      certAndKey = certAndKey.concat(cert.toString());
-      certAndKey = certAndKey.concat("\n");
-      certAndKey = certAndKey.concat(formatKey(keyBin));
+      if(userGlobal != "Hub Administrator"){
+        certAndKey = certAndKey.concat(cert.toString());
+        certAndKey = certAndKey.concat("\n");
+        certAndKey = certAndKey.concat(formatKey(keyBin));
+      }
+      
 
       issuedTo = crt_field2object(cert.subject)["CN"];
       issuedBy = crt_field2object(cert.issuer)["CN"];
@@ -294,12 +296,13 @@ class ServerCertificateCard extends React.Component {
        <FlexItem align={{ default: 'alignRight' }}>
        <Form>
           <ActionGroup>
+          { userGlobal === "Hub Administrator" ? <div/> :
+          <React.Fragment>
           <Button variant="primary" onClick={this.handleNewCertModalToggle}>New Certificate</Button>
-
           <Button variant="primary" onClick={this.handleUploadModalToggle}>Upload Certificate</Button>
-
           <Button variant="primary" onClick={downloadCertKey}>Download Certificate and Key</Button>
-
+          </React.Fragment>
+          }
           <ViewCertModal buttonText="View" certBin={certBin}/>
           </ActionGroup>
         </Form>

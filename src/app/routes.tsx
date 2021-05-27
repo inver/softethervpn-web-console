@@ -5,6 +5,7 @@ import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Support } from '@app/Support/Support';
 import { GeneralSettings } from '@app/Settings/General/GeneralSettings';
 import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
+import { LocalBridge } from '@app/Functionalities/LocalBridge/LocalBridge';
 import { Listeners } from '@app/Settings/Listeners/Listeners';
 import { EncryptionNetwork } from '@app/Settings/EncryptionAndNetwork/EncryptionAndNetwork';
 import { ClusterConfig } from '@app/Settings/ClusterConfiguration/ClusterConfiguration'
@@ -31,11 +32,13 @@ export interface IAppRoute {
   routes?: undefined;
   isAdmin?: boolean;
   isCluster?: boolean;
+  isBridge?: boolean;
 }
 
 export interface IAppRouteGroup {
   label: string;
   routes: IAppRoute[];
+  isAdmin?: boolean;
 }
 
 export type AppRouteConfig = IAppRoute | IAppRouteGroup;
@@ -59,8 +62,16 @@ let routes: AppRouteConfig[] = [
   {
     label: 'Functionalities',
     routes: [
-      
-    ]
+      {
+        component: LocalBridge,
+        exact: true,
+        isAsync: true,
+        label: 'Local Bridge',
+        path: '/functionalities/localbridge',
+        title: 'SoftEther VPN Console | Local Bridge',
+      },
+    ],
+    isAdmin: true,
   },
   {
     label: 'Settings',
@@ -81,7 +92,6 @@ let routes: AppRouteConfig[] = [
         label: 'Encryption And Network',
         path: '/settings/encryptionandnetwork',
         title: 'SoftEther VPN Console | Encryption And Network',
-        isAdmin: true,
       },
       {
         component: ClusterConfig,
@@ -91,6 +101,7 @@ let routes: AppRouteConfig[] = [
         path: '/settings/clusterconfig',
         title: 'SoftEther VPN Console | Clustering Configuration',
         isAdmin: true,
+        isBridge: true,
       },
       {
         component: ClusteringStatus,
