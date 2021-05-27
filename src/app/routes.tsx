@@ -57,6 +57,12 @@ let routes: AppRouteConfig[] = [
     title: 'SoftEther VPN Console | Support Page',
   },
   {
+    label: 'Functionalities',
+    routes: [
+      
+    ]
+  },
+  {
     label: 'Settings',
     routes: [
       {
