@@ -5,9 +5,18 @@ import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Support } from '@app/Support/Support';
 import { GeneralSettings } from '@app/Settings/General/GeneralSettings';
 import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
+import { Listeners } from '@app/Settings/Listeners/Listeners';
+import { EncryptionNetwork } from '@app/Settings/EncryptionAndNetwork/EncryptionAndNetwork';
+import { ClusterConfig } from '@app/Settings/ClusterConfiguration/ClusterConfiguration'
+import { ClusteringStatus } from '@app/Settings/ClusteringStatus/ClusteringStatus'
+import { EditConfig } from '@app/Settings/EditConfig/EditConfig';
+import { ConnectionsList } from '@app/Settings/ConnectionsList/ConnectionsList';
+import { ServerStatus } from '@app/Settings/ServerStatus/ServerStatus';
+import { About } from '@app/Settings/About/AboutThisServer';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import { LastLocationProvider, useLastLocation } from 'react-router-last-location';
+
 
 let routeFocusTimer: number;
 export interface IAppRoute {
@@ -20,6 +29,8 @@ export interface IAppRoute {
   title: string;
   isAsync?: boolean;
   routes?: undefined;
+  isAdmin?: boolean;
+  isCluster?: boolean;
 }
 
 export interface IAppRouteGroup {
@@ -29,13 +40,13 @@ export interface IAppRouteGroup {
 
 export type AppRouteConfig = IAppRoute | IAppRouteGroup;
 
-const routes: AppRouteConfig[] = [
+let routes: AppRouteConfig[] = [
   {
     component: Dashboard,
     exact: true,
     label: 'Dashboard',
     path: '/',
-    title: 'PatternFly Seed | Main Dashboard',
+    title: 'SoftEther VPN Console | Main Dashboard',
   },
   {
     component: Support,
@@ -43,28 +54,85 @@ const routes: AppRouteConfig[] = [
     isAsync: true,
     label: 'Support',
     path: '/support',
-    title: 'PatternFly Seed | Support Page',
+    title: 'SoftEther VPN Console | Support Page',
   },
   {
     label: 'Settings',
     routes: [
       {
-        component: GeneralSettings,
+        component: Listeners,
         exact: true,
-        label: 'General',
-        path: '/settings/general',
-        title: 'PatternFly Seed | General Settings',
+        isAsync: true,
+        label: 'Listeners',
+        path: '/settings/listeners',
+        title: 'SoftEther VPN Console | Listeners',
+        isAdmin: true,
       },
       {
-        component: ProfileSettings,
+        component: EncryptionNetwork,
         exact: true,
-        label: 'Profile',
-        path: '/settings/profile',
-        title: 'PatternFly Seed | Profile Settings',
+        isAsync: true,
+        label: 'Encryption And Network',
+        path: '/settings/encryptionandnetwork',
+        title: 'SoftEther VPN Console | Encryption And Network',
+        isAdmin: true,
+      },
+      {
+        component: ClusterConfig,
+        exact: true,
+        isAsync: true,
+        label: 'Clustering Configuration',
+        path: '/settings/clusterconfig',
+        title: 'SoftEther VPN Console | Clustering Configuration',
+        isAdmin: true,
+      },
+      {
+        component: ClusteringStatus,
+        exact: true,
+        isAsync: true,
+        label: 'Clustering Status',
+        path: '/settings/clusterstatus',
+        title: 'SoftEther VPN Console | Clustering Status',
+      },
+      {
+        component: EditConfig,
+        exact: true,
+        isAsync: true,
+        label: 'Edit Configuration',
+        path: '/settings/editconfig',
+        title: 'SoftEther VPN Console | Edit Config File',
+        isAdmin: true,
+      },
+      {
+        component: ConnectionsList,
+        exact: true,
+        isAsync: true,
+        label: 'Connections List',
+        path: '/settings/connections',
+        title: 'SoftEther VPN Console | Connections List',
+        isAdmin: true,
+      },
+      {
+        component: ServerStatus,
+        exact: true,
+        isAsync: true,
+        label: 'Server Status',
+        path: '/settings/serverstatus',
+        title: "SoftEther VPN Console | Server Status"
+      },
+      {
+        component: About,
+        exact: true,
+        isAsync: true,
+        label: 'About This VPN Server',
+        path: '/settings/about',
+        title: "SoftEther VPN Console | About This VPN Server"
       },
     ],
   },
 ];
+
+
 
 // a custom hook for sending focus to the primary content container
 // after a view has loaded so that subsequent press of tab key
@@ -119,5 +187,6 @@ const AppRoutes = (): React.ReactElement => (
     </Switch>
   </LastLocationProvider>
 );
+
 
 export { AppRoutes, routes };

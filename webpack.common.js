@@ -4,7 +4,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 const BG_IMAGES_DIRNAME = 'bgimages';
-const ASSET_PATH = process.env.ASSET_PATH || '/';
+const ASSET_PATH = process.env.ASSET_PATH || '/admin/manager/';
 module.exports = env => {
 
   return {
@@ -134,7 +134,8 @@ module.exports = env => {
         })
       ],
       symlinks: false,
-      cacheWithContext: false
+      cacheWithContext: false,
+      fallback: { "https": require.resolve("https-browserify"), "http": require.resolve("stream-http"), "path": require.resolve("path-browserify"), "crypto": require.resolve("crypto-browserify"), "stream": require.resolve("stream-browserify") }
     }
   }
 };

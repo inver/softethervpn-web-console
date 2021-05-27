@@ -7,11 +7,13 @@ import {
   NavExpandable,
   Page,
   PageHeader,
+  PageHeaderTools,
   PageSidebar,
   SkipToContent
 } from '@patternfly/react-core';
 import { routes, IAppRoute, IAppRouteGroup } from '@app/routes';
-import logo from '@app/bgimages/Patternfly-Logo.svg';
+import logo from '@app/bgimages/icons8-softether-vpn.svg';
+import { userGlobal } from '@app/index'
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -37,7 +39,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
       history.push('/');
     }
     return (
-      <img src={logo} onClick={handleClick} alt="PatternFly Logo" />
+      <img src={logo} onClick={handleClick} alt="icons8 Softether logo" />
     );
   }
 
@@ -47,6 +49,7 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
       showNavToggle
       isNavOpen={isNavOpen}
       onNavToggle={isMobileView ? onNavToggleMobile : onNavToggle}
+      headerTools={<PageHeaderTools>{userGlobal}</PageHeaderTools>}
     />
   );
 

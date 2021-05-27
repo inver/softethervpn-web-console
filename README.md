@@ -1,16 +1,12 @@
-# Patternfly Seed
+# SoftEther VPN Server Web Manager
 
-Patternfly Seed is an open source build scaffolding utility for web apps. The primary purpose of this project is to give developers a jump start when creating new projects that will use patternfly. A secondary purpose of this project is to serve as a reference for how to configure various aspects of an application that uses patternfly, webpack, react, typescript, etc.
-
-Out of the box you'll get an app layout with chrome (header/sidebar), routing, build pipeline, test suite, and some code quality tools. Basically, all the essentials.
-
-<img width="1058" alt="Out of box dashboard view of patternfly seed" src="https://user-images.githubusercontent.com/5942899/103803761-03a0a500-501f-11eb-870a-345d7d035e6b.png">
+This project aims to develop an HTML5 management UI for SoftEther VPN Server leveraging (by forking) the [Patternfly Seed](https://github.com/patternfly/patternfly-react-seed) and the [SoftEther VPN Server JSON-RPC API Suite](https://github.com/SoftEtherVPN/SoftEtherVPN/tree/master/developer_tools/vpnserver-jsonrpc-clients/).
 
 ## Quick-start
 
 ```bash
-git clone https://github.com/patternfly/patternfly-react-seed
-cd patternfly-react-seed
+git clone https://github.com/Leuca/softether-patternfly-ui
+cd softether-patternfly-ui
 npm install && npm run start:dev
 ```
 ## Development scripts
@@ -48,6 +44,8 @@ npm run storybook
 # Build storybook component explorer as standalone app (outputs to "storybook-static" dir)
 npm run build:storybook
 ```
+## Installing the web UI
+It is possible to try this UI by runnting ``` npm run build ```copying the content of the ``` build ``` folder into ``` src/bin/hamcore/wwwroot/admin/manager ```, which has to be created inside a previously cloned SoftEtherVPN source code and by compliling it.
 
 ## Configurations
 * [TypeScript Config](./tsconfig.json)
