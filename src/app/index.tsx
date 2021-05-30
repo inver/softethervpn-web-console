@@ -8,8 +8,8 @@ import { Bullseye, Spinner } from '@patternfly/react-core';
 import { api } from '@app/utils/vpnrpc_settings';
 import { BackgroundImage } from '@patternfly/react-core';
 
-export let userGlobal = "Unknown";
-export let ddnsHostnameGlobal = "";
+export let userGlobal = 'Unknown';
+export let ddnsHostnameGlobal = '';
 export let ddnsProxy: boolean;
 export let azureGlobal: boolean;
 export let capsListGlobal = [];
@@ -17,15 +17,14 @@ export let isTapSupported: boolean;
 export let isBridgeMode: boolean;
 export let isV4: boolean;
 
-function deleteLabel(label: string)
-{
-  routes.forEach(route => {
-    if(isIAppRouteGroup(route)){
-      route.routes.forEach(subroute => {
-        if(subroute.label == label){
-          delete subroute["label"];
+function deleteLabel(label: string) {
+  routes.forEach((route) => {
+    if (isIAppRouteGroup(route)) {
+      route.routes.forEach((subroute) => {
+        if (subroute.label == label) {
+          delete subroute['label'];
         }
-      })
+      });
     }
   });
 }
@@ -42,21 +41,18 @@ class LoadingPageBackground extends React.Component {
       sm: '/images/pfbg_768.jpg',
       sm2x: '/images/pfbg_768@2x.jpg',
       xs: '/images/pfbg_576.jpg',
-      xs2x: '/images/pfbg_576@2x.jpg'
+      xs2x: '/images/pfbg_576@2x.jpg',
     };
   }
 
   render() {
-    return (
-      <BackgroundImage src={this.images} />
-    );
+    return <BackgroundImage src={this.images} />;
   }
 }
 
-const adminErrorString = "Error: Code=52, Message=Error code 52: Not enough privileges.";
+const adminErrorString = 'Error: Code=52, Message=Error code 52: Not enough privileges.';
 
-function isIAppRouteGroup(arc: AppRouteConfig): arc is IAppRouteGroup
-{
+function isIAppRouteGroup(arc: AppRouteConfig): arc is IAppRouteGroup {
   return (arc as AppRouteConfig).path == undefined;
 }
 
@@ -68,14 +64,14 @@ const App: React.FunctionComponent = () => (
 
 const LoadingPage: React.FunctionComponent = () => (
   <Bullseye>
-  <LoadingPageBackground />
-  <Spinner size="xl"/>
+    <LoadingPageBackground />
+    <Spinner size="xl" />
   </Bullseye>
 );
 
 /* This is needed for hiding admin only paths to hub admins */
 class SoftetherRouter extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       loadingAdmin: true,
@@ -85,165 +81,167 @@ class SoftetherRouter extends React.Component {
     };
   }
 
-  componentDidMount(){
-    api.EnumConnection()
-    .then( () => {
-      // console.log(response)
-      userGlobal = "Administrator"
-      this.setState({ loadingAdmin: false });
-    })
-    .catch( error => {
-      if(error.toString() === adminErrorString){
-        routes.forEach(route => {
-            if(isIAppRouteGroup(route)){
-              route.routes.forEach(subroute => {
-                if(subroute.isAdmin === true){
-                  delete subroute["label"];
-                }
-              });
-            }
-            if(route.isAdmin === true){
-              delete route["label"];
-            }
-          });
-          userGlobal = "Hub Administrator";
-      }
-      this.setState({ loadingAdmin: false });
-      console.log(error)
-    });
-
-    api.GetFarmSetting()
-    .then( response => {
-      if( response.ServerType_u32 == 1 || response.ServerType_u32 == 2){
-        routes.forEach(route => {
-            if(isIAppRouteGroup(route)){
-              route.routes.forEach(subroute => {
-                if(subroute.isCluster === false){
-                  delete subroute["label"];
-                }
-              });
-            }
-            else{
-              if(route.isCluster === false){
-                delete route["label"];
-              }
-            }
-          });
-      }
-
-      if( response.ServerType_u32 == 0 ){
-        routes.forEach(route => {
-          if(isIAppRouteGroup(route) && route.label === "Settings"){
-            route.routes.forEach(subroute => {
-              if(subroute.label === "Clustering Status"){
-                delete subroute["label"]
-              }
-            });
-          }
-        });
-      }
-
-      this.setState({ loadingCluster: false });
-    })
-    .catch( error => {
-      console.log(error)
-      this.setState({ loadingCluster: false });
-    });
-
-    api.GetDDnsClientStatus()
-    .then( response => {
-      ddnsHostnameGlobal = response.CurrentHostName_str;
-
-      api.GetAzureStatus()
-      .then( response => {
-        azureGlobal = response.IsEnabled_bool;
-
-        this.setState({ loadigDDNSAzure: false });
-        // console.log(azureGlobal)
-        // console.log(ddnsGlobal)
+  componentDidMount() {
+    api
+      .EnumConnection()
+      .then(() => {
+        // console.log(response)
+        userGlobal = 'Administrator';
+        this.setState({ loadingAdmin: false });
       })
-      .catch( error => {
-        this.setState({ loadigDDNSAzure: false });
-        console.log(error)
+      .catch((error) => {
+        if (error.toString() === adminErrorString) {
+          routes.forEach((route) => {
+            if (isIAppRouteGroup(route)) {
+              route.routes.forEach((subroute) => {
+                if (subroute.isAdmin === true) {
+                  delete subroute['label'];
+                }
+              });
+            }
+            if (route.isAdmin === true) {
+              delete route['label'];
+            }
+          });
+          userGlobal = 'Hub Administrator';
+        }
+        this.setState({ loadingAdmin: false });
+        console.log(error);
       });
 
-    })
-    .catch( error => {
-      this.setState({ loadigDDNSAzure: false });
-      console.log(error)
-    });
-
-    api.GetCaps()
-    .then( response => {
-      capsListGlobal = response.CapsList;
-      isTapSupported = response.caps_b_tap_supported_u32 == 1;// assign isTapSupported
-      isBridgeMode = response.caps_b_bridge_u32 == 1;
-      isV4 = response.caps_b_vpn4_u32 == 1;
-      ddnsProxy = response.caps_b_support_ddns_proxy_u32 == 1;
-
-      // hide local bridge functionality
-      if(response.caps_b_local_bridge_u32 == 0){
-        deleteLabel("Local Bridge")
-      }
-
-      // hide cluster functionality
-      if(response.caps_b_support_cluster_u32 == 0){
-        deleteLabel("Clustering Configuration")
-      }
-
-      // hide layer 3
-      if(response.caps_b_support_layer3_u32 == 0){
-        deleteLabel("Layer 3 Switch")
-      }
-
-      // hide azure
-      if(response.caps_b_support_azure_u32 == 0){
-        deleteLabel("VPN Azure")
-      }
-
-      // hide ddns
-      if(response.caps_b_support_ddns_u32 == 0){
-        deleteLabel("Dynamic DNS")
-      }
-
-      if(isBridgeMode){
-        routes.forEach(route => {
-            if(isIAppRouteGroup(route)){
-              route.routes.forEach(subroute => {
-                if(subroute.isBridge === true){
-                  delete subroute["label"];
+    api
+      .GetFarmSetting()
+      .then((response) => {
+        if (response.ServerType_u32 == 1 || response.ServerType_u32 == 2) {
+          routes.forEach((route) => {
+            if (isIAppRouteGroup(route)) {
+              route.routes.forEach((subroute) => {
+                if (subroute.isCluster === false) {
+                  delete subroute['label'];
                 }
               });
-            }
-            else{
-              if(route.isBridge === true){
-                delete route["label"];
+            } else {
+              if (route.isCluster === false) {
+                delete route['label'];
               }
             }
           });
-      }
+        }
 
-      this.setState({ loadingCaps: false });
-    })
-    .catch( error => {
-      console.log(error)
-      this.setState({ loadingCaps: false });
-    });
+        if (response.ServerType_u32 == 0) {
+          routes.forEach((route) => {
+            if (isIAppRouteGroup(route) && route.label === 'Settings') {
+              route.routes.forEach((subroute) => {
+                if (subroute.label === 'Clustering Status') {
+                  delete subroute['label'];
+                }
+              });
+            }
+          });
+        }
+
+        this.setState({ loadingCluster: false });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({ loadingCluster: false });
+      });
+
+    api
+      .GetDDnsClientStatus()
+      .then((response) => {
+        ddnsHostnameGlobal = response.CurrentHostName_str;
+
+        api
+          .GetAzureStatus()
+          .then((response) => {
+            azureGlobal = response.IsEnabled_bool;
+
+            this.setState({ loadigDDNSAzure: false });
+            // console.log(azureGlobal)
+            // console.log(ddnsGlobal)
+          })
+          .catch((error) => {
+            this.setState({ loadigDDNSAzure: false });
+            console.log(error);
+          });
+      })
+      .catch((error) => {
+        this.setState({ loadigDDNSAzure: false });
+        console.log(error);
+      });
+
+    api
+      .GetCaps()
+      .then((response) => {
+        capsListGlobal = response.CapsList;
+        isTapSupported = response.caps_b_tap_supported_u32 == 1; // assign isTapSupported
+        isBridgeMode = response.caps_b_bridge_u32 == 1;
+        isV4 = response.caps_b_vpn4_u32 == 1;
+        ddnsProxy = response.caps_b_support_ddns_proxy_u32 == 1;
+
+        // hide local bridge functionality
+        if (response.caps_b_local_bridge_u32 == 0) {
+          deleteLabel('Local Bridge');
+        }
+
+        // hide cluster functionality
+        if (response.caps_b_support_cluster_u32 == 0) {
+          deleteLabel('Clustering Configuration');
+        }
+
+        // hide layer 3
+        if (response.caps_b_support_layer3_u32 == 0) {
+          deleteLabel('Layer 3 Switch');
+        }
+
+        // hide azure
+        if (response.caps_b_support_azure_u32 == 0) {
+          deleteLabel('VPN Azure');
+        }
+
+        // hide ddns
+        if (response.caps_b_support_ddns_u32 == 0) {
+          deleteLabel('Dynamic DNS');
+        }
+
+        if (isBridgeMode) {
+          routes.forEach((route) => {
+            if (isIAppRouteGroup(route)) {
+              route.routes.forEach((subroute) => {
+                if (subroute.isBridge === true) {
+                  delete subroute['label'];
+                }
+              });
+            } else {
+              if (route.isBridge === true) {
+                delete route['label'];
+              }
+            }
+          });
+        }
+
+        this.setState({ loadingCaps: false });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({ loadingCaps: false });
+      });
   } // componentDidMount
 
-
-  render(){
-    const { loadingAdmin, loadingCluster, loadigDDNSAzure, loadingCaps} = this.state;
+  render() {
+    const { loadingAdmin, loadingCluster, loadigDDNSAzure, loadingCaps } = this.state;
     const loading = loadingAdmin || loadingCluster || loadigDDNSAzure || loadingCaps;
-
 
     return (
       <React.Fragment>
-      { loading ? <LoadingPage /> :
-      <AppLayout>
-        <AppRoutes />
-      </AppLayout>}
-
+        {loading ? (
+          <LoadingPage />
+        ) : (
+          <AppLayout>
+            <AppRoutes />
+          </AppLayout>
+        )}
       </React.Fragment>
     );
   }

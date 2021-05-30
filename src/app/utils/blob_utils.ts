@@ -1,4 +1,4 @@
-export const b64toBlob = (b64Data: string, contentType='', sliceSize=512) => {
+export const b64toBlob = (b64Data: string, contentType = '', sliceSize = 512) => {
   const byteCharacters = atob(b64Data);
   const byteArrays = [];
 
@@ -14,17 +14,16 @@ export const b64toBlob = (b64Data: string, contentType='', sliceSize=512) => {
     byteArrays.push(byteArray);
   }
 
-  const blob = new Blob(byteArrays, {type: contentType});
+  const blob = new Blob(byteArrays, { type: contentType });
   return blob;
-}
+};
 
-export function downloadBlob(blob: Blob, name = 'file.txt')
-{
+export function downloadBlob(blob: Blob, name = 'file.txt') {
   // Convert your blob into a Blob URL (a special url that points to an object in the browser's memory)
   const blobUrl = URL.createObjectURL(blob);
 
   // Create a link element
-  const link = document.createElement("a");
+  const link = document.createElement('a');
 
   // Set link's href to point to the Blob URL
   link.href = blobUrl;
@@ -39,7 +38,7 @@ export function downloadBlob(blob: Blob, name = 'file.txt')
     new MouseEvent('click', {
       bubbles: true,
       cancelable: true,
-      view: window
+      view: window,
     })
   );
 

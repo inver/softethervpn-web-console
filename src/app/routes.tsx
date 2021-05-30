@@ -9,8 +9,8 @@ import { DynDNS } from '@app/Functionalities/DDNS/DDNS';
 import { VpnAzure } from '@app/Functionalities/VPNAzure/VPNAzure';
 import { Listeners } from '@app/Settings/Listeners/Listeners';
 import { EncryptionNetwork } from '@app/Settings/EncryptionAndNetwork/EncryptionAndNetwork';
-import { ClusterConfig } from '@app/Settings/ClusterConfiguration/ClusterConfiguration'
-import { ClusteringStatus } from '@app/Settings/ClusteringStatus/ClusteringStatus'
+import { ClusterConfig } from '@app/Settings/ClusterConfiguration/ClusterConfiguration';
+import { ClusteringStatus } from '@app/Settings/ClusteringStatus/ClusteringStatus';
 import { EditConfig } from '@app/Settings/EditConfig/EditConfig';
 import { ConnectionsList } from '@app/Settings/ConnectionsList/ConnectionsList';
 import { ServerStatus } from '@app/Settings/ServerStatus/ServerStatus';
@@ -18,7 +18,6 @@ import { About } from '@app/Settings/About/AboutThisServer';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import { LastLocationProvider, useLastLocation } from 'react-router-last-location';
-
 
 let routeFocusTimer: number;
 export interface IAppRoute {
@@ -160,7 +159,7 @@ const routes: AppRouteConfig[] = [
         isAsync: true,
         label: 'Server Status',
         path: '/settings/serverstatus',
-        title: "SoftEther VPN Console | Server Status"
+        title: 'SoftEther VPN Console | Server Status',
       },
       {
         component: About,
@@ -168,13 +167,11 @@ const routes: AppRouteConfig[] = [
         isAsync: true,
         label: 'About This VPN Server',
         path: '/settings/about',
-        title: "SoftEther VPN Console | About This VPN Server"
+        title: 'SoftEther VPN Console | About This VPN Server',
       },
     ],
   },
 ];
-
-
 
 // a custom hook for sending focus to the primary content container
 // after a view has loaded so that subsequent press of tab key
@@ -229,6 +226,5 @@ const AppRoutes = (): React.ReactElement => (
     </Switch>
   </LastLocationProvider>
 );
-
 
 export { AppRoutes, routes };
