@@ -3,13 +3,10 @@ import {
   Table,
   TableHeader,
   TableBody,
-  TableVariant,
 } from '@patternfly/react-table';
 import {
   Title,
-  Page,
   PageSection,
-  Checkbox,
   PageSectionVariants,
   Stack,
   StackItem,
@@ -84,41 +81,34 @@ class ConnectionsTable extends React.Component {
     };
   }
 
-  componentDidMount(){
+  loadConnections(){
     api.EnumConnection().then(response => {
-      let rows = [];
-      response.ConnectionList.forEach(element => {
-        let row = { cells: [] };
-        row.cells.push(element.Name_str);
-        row.cells.push(element.Hostname_str + ': ' + element.Port_u32.toString());
-        row.cells.push(element.ConnectedTime_dt);
-        row.cells.push(element.Ip_ip.toString());
-        row.cells.push(element.Type_u32);
-        rows.push(row);
+      const rows = response.ConnectionList.map((element) => {
+        const row = { cells: [
+          element.Name_str,
+          element.Hostname_str + ': ' + element.Port_u32.toString(),
+          element.ConnectedTime_dt,
+          element.Ip_ip.toString(),
+          element.Type_u32,
+        ] };
+        return (row);
       });
+
       this.setState({ rows: rows, loading: false });
     });
   }
 
+  componentDidMount(){
+    this.loadConnections()
+  }
+
   componentDidUpdate(){
     if(this.state.loading){
-      api.EnumConnection().then(response => {
-        let rows = [];
-        response.ConnectionList.forEach(element => {
-          let row = { cells: [] };
-          row.cells.push(element.Name_str);
-          row.cells.push(element.Hostname_str + ': ' + element.Port_u32.toString());
-          row.cells.push(element.ConnectedTime_dt);
-          row.cells.push(element.Ip_ip.toString());
-          row.cells.push(element.Type_u32);
-          rows.push(row);
-        });
-        this.setState({ rows: rows, loading: false });
-      });
+      this.loadConnections()
     }
   }
 
-  onSelect(event, isSelected, rowId, numSelected) {
+  onSelect(event, isSelected, rowId) {
     let rows;
     if (rowId === -1) {
       rows = this.state.rows.map(oneRow => {
@@ -149,18 +139,15 @@ class ConnectionsTable extends React.Component {
     });
   }
 
-  showInfo(rows) {
-
-  }
 
   disconnectSelections = rows => {
     rows.forEach(row => {
       if(row.selected){
-        let param: VPN.VpnRpcConnectionInfo = new VPN.VpnRpcConnectionInfo(
+        const param: VPN.VpnRpcConnectionInfo = new VPN.VpnRpcConnectionInfo(
           {
               Name_str: row.cells[0],
           });
-        api.DisconnectConnection(param).then(response => {
+        api.DisconnectConnection(param).then( () => {
           this.setState({ loading: true, numSelected: 0});
         }).catch(error => {
           console.log(error)
@@ -169,7 +156,7 @@ class ConnectionsTable extends React.Component {
     });
   }
 
-  renderConnection = rows => {
+  renderConnection = (rows) => {
     let name = ''
     for( let i = 0; i < rows.length; i++){
       if( rows[i].selected ){
@@ -178,13 +165,12 @@ class ConnectionsTable extends React.Component {
       }
     }
 
-    let param: VPN.VpnRpcConnectionInfo = new VPN.VpnRpcConnectionInfo(
+    const param: VPN.VpnRpcConnectionInfo = new VPN.VpnRpcConnectionInfo(
       {
           Name_str: name,
       });
 
-    const conn_cols = [ 'Item', 'Value' ];
-    let conn_rows = [];
+    const conn_rows = [];
     api.GetConnectionInfo(param).then(response => {
       Object.keys(response).forEach(key => {
         conn_rows.push([split_string_by_capitalization(key), response[key]])
@@ -227,11 +213,11 @@ class ConnectionsTable extends React.Component {
         title={"Connection Informations"}
         isOpen={isModalOpen}
         onClose={this.handleModalToggle}
-        actions={[
+        actions={
           <Button variant="secondary" onClick={this.handleModalToggle}>
             Exit
           </Button>
-        ]}
+        }
       >
       <Table
       aria-label="Connection Table"

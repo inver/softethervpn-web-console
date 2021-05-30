@@ -3,10 +3,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardTitle,
-  CardFooter,
-  Bullseye,
-  Spinner,
   Stack,
   StackItem,
   Flex,
@@ -23,7 +19,7 @@ import * as VPN from "vpnrpc/dist/vpnrpc";
 
 
 class AdminPasswordCard extends React.Component {
-  constructor(props){
+  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
 
     this.state = {
@@ -50,12 +46,12 @@ class AdminPasswordCard extends React.Component {
     };
 
     this.confirmClick = () => {
-      let param: VPN.VpnRpcSetPassword = new VPN.VpnRpcSetPassword({
+      const param: VPN.VpnRpcSetPassword = new VPN.VpnRpcSetPassword({
         PlainTextPassword_str: this.state.password,
       });
 
       api.SetServerPassword(param)
-      .then(response => {
+      .then(() => {
         this.setState({ isModalOpen: false });
         window.location.reload();
       })
@@ -66,7 +62,7 @@ class AdminPasswordCard extends React.Component {
   }
 
 
-  render(){
+  render(): void {
     const { isModalOpen, password, confirm, valid } = this.state;
 
     return(

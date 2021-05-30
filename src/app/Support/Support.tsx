@@ -15,7 +15,7 @@ export interface ISupportProps {
   sampleProp?: string;
 }
 
-let Support: React.FunctionComponent<ISupportProps> = () => (
+const Support: React.FunctionComponent<ISupportProps> = () => (
   <PageSection>
     <EmptyState variant={EmptyStateVariant.full}>
       <EmptyStateIcon icon={CubesIcon} />

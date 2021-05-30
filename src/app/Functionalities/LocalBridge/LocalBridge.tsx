@@ -16,9 +16,7 @@ import {
   Divider,
   Card,
   CardTitle,
-  CardHeader,
   CardBody,
-  CardFooter,
   TextContent,
   Title,
   Text,
@@ -28,7 +26,6 @@ import {
   Bullseye,
   EmptyState,
   EmptyStateVariant,
-  EmptyStateIcon,
   EmptyStateBody,
   Alert,
   Spinner
@@ -37,7 +34,6 @@ import {
   Table,
   TableHeader,
   TableBody,
-  TableVariant,
 } from '@patternfly/react-table';
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
@@ -122,7 +118,6 @@ class LocalBridgeCard extends React.Component {
     this.hubOptions = [<SelectOption key={0} value='Loading...' isPlaceholder />];
 
     this.state = {
-      loading: true,
       columns: ['Number', 'Type', 'Virtual Hub Name', 'Network Adapter or Tap Device Name', 'Status'],
       rows: [loadingTable],
       isBridgeDisabled: false,
@@ -144,7 +139,7 @@ class LocalBridgeCard extends React.Component {
       });
     };
 
-    this.onAdapterSelect = (event, selection, isPlaceholder) => {
+    this.onAdapterSelect = (event, selection) => {
         this.setState({
           selectedAdapter: selection,
           isAdapterOpen: false
@@ -157,7 +152,7 @@ class LocalBridgeCard extends React.Component {
       });
     };
 
-    this.onHubSelect = (event, selection, isPlaceholder) => {
+    this.onHubSelect = (event, selection) => {
         this.setState({
           selectedHub: selection,
           isHubOpen: false
@@ -188,7 +183,6 @@ class LocalBridgeCard extends React.Component {
     this.onDeleteClick = () => {
       let selectedCounter = 0;
       let counter = 0;
-      let length = this.state.rows.length;
 
       this.state.rows.forEach(row => {
         if(row.selected){
@@ -199,13 +193,13 @@ class LocalBridgeCard extends React.Component {
       this.state.rows.forEach(row => {
         if(row.selected){
           counter ++;
-          let param: VPN.VpnRpcLocalBridge = new VPN.VpnRpcLocalBridge({
+          const param: VPN.VpnRpcLocalBridge = new VPN.VpnRpcLocalBridge({
             DeviceName_str: row.cells[3],
             HubNameLB_str: row.cells[2]
           });
 
           api.DeleteLocalBridge(param)
-          .then( response => {
+          .then( () => {
             if(selectedCounter == counter){
               this.setState({ loading: true });
             }
@@ -225,14 +219,14 @@ class LocalBridgeCard extends React.Component {
         name = this.state.tapname;
       }
 
-      let param: VPN.VpnRpcLocalBridge = new VPN.VpnRpcLocalBridge({
+      const param: VPN.VpnRpcLocalBridge = new VPN.VpnRpcLocalBridge({
         DeviceName_str: name,
         HubNameLB_str: this.state.selectedHub,
         TapMode_bool: this.state.tap
       });
 
       api.AddLocalBridge(param)
-      .then( response => {
+      .then( () => {
         this.setState({ loading: true });
       })
       .catch( error => { console.log(error) });
@@ -242,7 +236,7 @@ class LocalBridgeCard extends React.Component {
 
   loadTable(){
     api.GetBridgeSupport().then( response => {
-      let bridge = response.IsBridgeSupportedOs_bool;
+      const bridge = response.IsBridgeSupportedOs_bool;
       let canSelectAll = false;
 
       if(bridge){
@@ -268,7 +262,7 @@ class LocalBridgeCard extends React.Component {
                 status = "Operational"
               }
 
-              let row = { cells: [
+              const row = { cells: [
                 number,
                 mode,
                 bridge.HubNameLB_str,
@@ -304,20 +298,18 @@ class LocalBridgeCard extends React.Component {
     api.EnumHub()
     .then( response => {
       if( response.HubList.length > 0 ){
-        let hublist = [];
-        let counter = 0;
+        let counter = -1;
 
-        response.HubList.forEach(hub => {
-          hublist.push(
-            <SelectOption key={counter} value={hub.HubName_str} />
-          );
-          if(counter == 0){
+        this.hubOptions = response.HubList.map((hub) => {
+          if(counter == -1){
             this.setState({ selectedHub: hub.HubName_str })
           }
           counter++;
-        });
+          return(
+            <SelectOption key={counter} value={hub.HubName_str} />
+          );
 
-        this.hubOptions = hublist;
+        });
       }
     })
     .catch( error => {
@@ -329,21 +321,18 @@ class LocalBridgeCard extends React.Component {
     api.EnumEthernet()
     .then( response => {
       if(response.EthList.length > 0){
-        let adapterlist = [];
-        let counter = 0;
+        let counter = -1;
 
-        response.EthList.forEach(eth => {
-          adapterlist.push(
-            <SelectOption key={counter} value={eth.DeviceName_str} />
-
-          );
-          if(counter == 0){
+        this.adapterOptions = response.EthList.map((eth) => {
+          if(counter == -1){
             this.setState({ selectedAdapter: eth.DeviceName_str })
           }
           counter ++;
-        });
+          return(
+            <SelectOption key={counter} value={eth.DeviceName_str} />
+          );
 
-        this.adapterOptions = adapterlist;
+        });
       }
     })
     .catch( error => {
@@ -393,7 +382,6 @@ class LocalBridgeCard extends React.Component {
 
   render(){
     const {
-      loading,
       columns,
       rows,
       isBridgeDisabled,

@@ -3,15 +3,10 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardTitle,
-  CardFooter,
-  Bullseye,
-  Spinner,
   Stack,
   StackItem,
   Form,
   FormGroup,
-  ActionGroup,
   Alert,
   Checkbox,
   TextInput,
@@ -27,7 +22,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class KeepAliveCard extends React.Component {
-  constructor(props){
+  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
 
     this.minPort = 1;
@@ -104,7 +99,7 @@ class KeepAliveCard extends React.Component {
 
     this.onSaveClick = () => {
       this.setState({ loading: true });
-      let param: VPN.VpnRpcKeep = new VPN.VpnRpcKeep({
+      const param: VPN.VpnRpcKeep = new VPN.VpnRpcKeep({
         UseKeepConnect_bool: this.state.useFunction,
         KeepConnectHost_str: this.state.hostValue,
         KeepConnectPort_u32: this.state.portValue,
@@ -144,7 +139,7 @@ class KeepAliveCard extends React.Component {
     };
   }
 
-  componentDidMount(){
+  componentDidMount(): void {
     api.GetKeep({})
     .then( response => {
 
@@ -175,7 +170,7 @@ class KeepAliveCard extends React.Component {
     });
   }
 
-  render(){
+  render(): void {
     const { loading, useFunction, hostValue, portValue, intervalValue, tcp, udp } = this.state;
 
     return(
@@ -261,7 +256,7 @@ class KeepAliveCard extends React.Component {
        <GridItem span={6}>
        <FormGroup>
          <Radio
-           isChecked={this.state.tcp}
+           isChecked={tcp}
            name="tcp radio"
            onChange={this.handleRadioChange}
            label="TCP/IP Protocol"
@@ -274,7 +269,7 @@ class KeepAliveCard extends React.Component {
        <GridItem span={6}>
        <FormGroup>
          <Radio
-           isChecked={this.state.udp}
+           isChecked={udp}
            name="udp radio"
            onChange={this.handleRadioChange}
            label="UDP/IP Protocol"

@@ -8,7 +8,6 @@ import {
   Card,
   CardTitle,
   CardBody,
-  CardFooter,
   DataList,
   DataListItem,
   DataListItemRow,
@@ -17,7 +16,7 @@ import {
 } from '@patternfly/react-core';
 import * as x509 from "../../../node_modules/@peculiar/x509";
 import { crt_field2object } from '@app/utils/string_utils';
-import { downloadBlob, b64toBlob } from '@app/utils/blob_utils';
+import { downloadBlob } from '@app/utils/blob_utils';
 
 function prettyHex(rawString: string): string
 {
@@ -33,14 +32,15 @@ function prettyHex(rawString: string): string
 }
 
 class ViewCertModal extends React.Component {
-  constructor(props) {
+  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>) {
     super(props);
     this.state = {
       isModalOpen: false,
       cert: null,
-      issuedTo: "",
-      issuer: "",
-      expiresAt: ""
+      issuedToObject: {},
+      issuedByObject: {},
+      pubKey: "",
+      signature: "",
     };
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
@@ -48,48 +48,36 @@ class ViewCertModal extends React.Component {
       }));
     };
 
-
+    this.onDownloadClick = () => {
+      downloadBlob(new Blob([this.state.cert.toString()], { type: "text/plain"}), this.state.issuedToObject["CN"] + ".pem");
+    };
   }
 
-  componentDidUpdate(){
+  componentDidUpdate(): void {
     if(this.props.certBin != null && this.state.cert == null ){
-      let cert = new x509.X509Certificate(this.props.certBin);
-      this.setState({ cert: cert });
+      const cert = new x509.X509Certificate(this.props.certBin);
+
+      const signatureView = new Uint32Array(cert.signature);
+      let signatureStr = ""
+      for (let i = 0; i<signatureView.length; i++){
+        signatureStr = signatureStr.concat(signatureView[i]);
+      }
+
+
+      this.setState({
+        cert: cert,
+        issuedToObject: crt_field2object(cert.subject),
+        issuedByObject: crt_field2object(cert.issuer),
+        pubKey: prettyHex(cert.publicKey.toString("hex")),
+        signature: prettyHex(signatureStr),
+      });
       // console.log(cert)
       // console.log(crt_field2object(cert.subject))
     }
   }
 
-  render() {
-    const { isModalOpen, cert, issuedTo, issuer, expiresAt } = this.state;
-
-    let name = ""
-
-    if(cert != null){
-      let issuedToObject = crt_field2object(cert.subject);
-      let issuedByObject = crt_field2object(cert.issuer);
-      let pubKey = prettyHex(cert.publicKey.toString("hex"));
-      let signatureView = new Uint32Array(cert.signature);
-      let signatureStr = ""
-      for (let i = 0; i<signatureView.length; i++){
-        signatureStr = signatureStr.concat(signatureView[i]);
-      }
-      let signature = prettyHex(signatureStr)
-      name = issuedToObject["CN"];
-
-      const downloadCert = () => {
-        downloadBlob(new Blob([cert.toString()], { type: "text/plain"}), name + ".pem");
-        // console.log(name)
-      }
-
-      let title_completion = this.props.name;
-
-      if (title_completion == "" || title_completion == null || title_completion == undefined){
-        title_completion = issuedToObject["CN"];
-      }
-    }
-
-
+  render(): React.Component {
+    const { isModalOpen, cert, issuedToObject, issuedByObject, pubKey, signature } = this.state;
 
 
     return (
@@ -99,11 +87,11 @@ class ViewCertModal extends React.Component {
         </Button>
         <Modal
           variant={ModalVariant.large}
-          title={"Certificate for " + title_completion}
+          title={"Certificate for " + issuedToObject["CN"]}
           isOpen={isModalOpen}
           onClose={this.handleModalToggle}
           actions={[
-            <Button key="download" variant="primary" onClick={downloadCert}>
+            <Button key="download" variant="primary" onClick={this.onDownloadClick}>
               Download Certificate
             </Button>,
             <Button key="cancel" variant="link" onClick={this.handleModalToggle}>

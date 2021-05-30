@@ -3,9 +3,10 @@ import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { accessibleRouteChangeHandler } from '@app/utils/utils';
 import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Support } from '@app/Support/Support';
-import { GeneralSettings } from '@app/Settings/General/GeneralSettings';
-import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
 import { LocalBridge } from '@app/Functionalities/LocalBridge/LocalBridge';
+import { Layer3Switch } from '@app/Functionalities/Layer3Switch/Layer3Switch';
+import { DynDNS } from '@app/Functionalities/DDNS/DDNS';
+import { VpnAzure } from '@app/Functionalities/VPNAzure/VPNAzure';
 import { Listeners } from '@app/Settings/Listeners/Listeners';
 import { EncryptionNetwork } from '@app/Settings/EncryptionAndNetwork/EncryptionAndNetwork';
 import { ClusterConfig } from '@app/Settings/ClusterConfiguration/ClusterConfiguration'
@@ -43,7 +44,7 @@ export interface IAppRouteGroup {
 
 export type AppRouteConfig = IAppRoute | IAppRouteGroup;
 
-let routes: AppRouteConfig[] = [
+const routes: AppRouteConfig[] = [
   {
     component: Dashboard,
     exact: true,
@@ -69,6 +70,30 @@ let routes: AppRouteConfig[] = [
         label: 'Local Bridge',
         path: '/functionalities/localbridge',
         title: 'SoftEther VPN Console | Local Bridge',
+      },
+      {
+        component: Layer3Switch,
+        exact: true,
+        isAsync: true,
+        label: 'Layer 3 Switch',
+        path: '/functionalities/layer3switch',
+        title: 'SoftEther VPN Console | Layer 3 Switch',
+      },
+      {
+        component: DynDNS,
+        exact: true,
+        isAsync: true,
+        label: 'Dynamic DNS',
+        path: '/functionalities/ddns',
+        title: 'SoftEther VPN Console | Dynamic DNS',
+      },
+      {
+        component: VpnAzure,
+        exact: true,
+        isAsync: true,
+        label: 'VPN Azure',
+        path: '/functionalities/vpnazure',
+        title: 'SoftEther VPN Console | VPN Azure',
       },
     ],
     isAdmin: true,

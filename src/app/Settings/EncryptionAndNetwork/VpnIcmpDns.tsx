@@ -3,10 +3,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardTitle,
-  CardFooter,
-  Bullseye,
-  Spinner,
   Stack,
   StackItem,
   Flex,
@@ -23,7 +19,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class IcmpDnsCard extends React.Component {
-  constructor(props){
+  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
 
     this.state = {
@@ -57,14 +53,11 @@ class IcmpDnsCard extends React.Component {
     };
 
     this.handleConfirm = () => {
-      let param: VPN.VpnRpcSpecialListener = new VPN.VpnRpcSpecialListener({
+      const param: VPN.VpnRpcSpecialListener = new VPN.VpnRpcSpecialListener({
         VpnOverIcmpListener_bool: this.state.icmp,
         VpnOverDnsListener_bool: this.state.dns,
       });
       api.SetSpecialListener(param)
-      .then( response => {
-
-      })
       .catch( error => {
         console.log(error)
       });
@@ -74,7 +67,7 @@ class IcmpDnsCard extends React.Component {
   }
 
 
-  render(){
+  render(): void {
     const { loading, isModalOpen, icmp, dns } = this.state;
 
     return(

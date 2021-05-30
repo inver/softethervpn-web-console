@@ -3,10 +3,7 @@ import {
   Flex,
   FlexItem,
   PageSection,
-  PageSectionVariants,
-  Title,
-  Bullseye,
-  Spinner,
+  Divider
 } from '@patternfly/react-core';
 import { ServerEncryptionCard } from '@app/Settings/EncryptionAndNetwork/EncryptionAlgorithm';
 import { ServerCertificateCard } from '@app/Settings/EncryptionAndNetwork/CertificateSettings';
@@ -39,11 +36,13 @@ const EncryptionNetwork: React.FunctionComponent = () => (
   </FlexItem>
   }
   </Flex>
+
   { userGlobal === "Hub Administrator" ?
     <div/>
     :
   <Flex direction={{ default: 'column' }} flex={{ default: 'flex_1' }}>
   <FlexItem>
+  <Divider component="div" />
     <KeepAliveCard />
   </FlexItem>
   <FlexItem>

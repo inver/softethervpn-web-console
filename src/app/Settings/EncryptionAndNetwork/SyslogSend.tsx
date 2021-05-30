@@ -3,8 +3,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardTitle,
-  CardFooter,
   Bullseye,
   Spinner,
   Form,
@@ -48,7 +46,7 @@ function stringToNum(string: string): number
 }
 
 class SyslogCard extends React.Component {
-  constructor(props){
+  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
     this.options = [
       <SelectOption key={0} value="Disable Syslog Send Function" />,
@@ -110,18 +108,18 @@ class SyslogCard extends React.Component {
 
     this.onSaveClick = () => {
       this.setState({ loading: true });
-      let param: VPN.VpnSyslogSetting = new VPN.VpnSyslogSetting({
+      const param: VPN.VpnSyslogSetting = new VPN.VpnSyslogSetting({
         SaveType_u32: stringToNum(this.state.selected),
         Hostname_str: this.state.hostValue,
         Port_u32: this.state.portValue,
       });
 
       api.SetSysLog(param)
-      .then( response => {
+      .then( () => {
 
         api.GetSysLog({})
         .then( response => {
-          let selected = numToString(response.SaveType_u32);
+          const selected = numToString(response.SaveType_u32);
 
           if(response.Port_u32 != 0){
             this.setState({ loading: false, selected: selected, hostValue: response.Hostname_str, portValue: response.Port_u32 });
@@ -142,10 +140,10 @@ class SyslogCard extends React.Component {
 
   }
 
-  componentDidMount(){
+  componentDidMount(): void {
     api.GetSysLog({})
     .then( response => {
-      let selected = numToString(response.SaveType_u32);
+      const selected = numToString(response.SaveType_u32);
 
       if(response.Port_u32 != 0){
         this.setState({ loading: false, selected: selected, hostValue: response.Hostname_str, portValue: response.Port_u32 });
@@ -160,7 +158,7 @@ class SyslogCard extends React.Component {
     });
   }
 
-  render(){
+  render(): void {
     const { loading, selected, isOpen, hostValue, portValue } = this.state;
 
     return(
@@ -186,7 +184,7 @@ class SyslogCard extends React.Component {
             isDisabled={false}
             direction={SelectDirection.down}
           >
-            {loading ? <SelectOption key={0} children={<Bullseye><Spinner size="sm" /></Bullseye>} /> : this.options}
+            {loading ? <SelectOption key={0} ><Bullseye><Spinner size="sm" /></Bullseye></SelectOption> : this.options}
           </Select>
           </FormGroup>
           <FormGroup label="Syslog Server Host Name">

@@ -4,8 +4,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardTitle,
-  CardFooter,
   Bullseye,
   Spinner,
   Stack,
@@ -21,7 +19,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class ServerEncryptionCard extends React.Component {
-  constructor(props){
+  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
 
     this.options = [
@@ -75,7 +73,7 @@ class ServerEncryptionCard extends React.Component {
     this.onSelect = (event, selection, isPlaceholder) => {
       if (isPlaceholder) this.clearSelection();
       else {
-        let param: VPN.VpnRpcStr = new VPN.VpnRpcStr({
+        const param: VPN.VpnRpcStr = new VPN.VpnRpcStr({
           String_str: selection,
         });
 
@@ -92,7 +90,7 @@ class ServerEncryptionCard extends React.Component {
     };
   }
 
-  componentDidMount(){
+  componentDidMount(): void {
     api.GetServerCipher()
     .then( response => {
       this.setState({ loading: false, selected: response.String_str });
@@ -103,7 +101,7 @@ class ServerEncryptionCard extends React.Component {
 
   }
 
-  render(){
+  render(): void {
     const { loading, isOpen, selected, isDisabled, direction } = this.state;
 
 
@@ -133,7 +131,7 @@ class ServerEncryptionCard extends React.Component {
             direction={direction}
             maxHeight={320}
           >
-            {loading ? <SelectOption key={0} children={<Bullseye><Spinner size="sm" /></Bullseye>} /> : this.options}
+            {loading ? <SelectOption key={0} ><Bullseye><Spinner size="sm" /></Bullseye></SelectOption> : this.options}
           </Select>
           </FormGroup>
           </Form>

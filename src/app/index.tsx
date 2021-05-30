@@ -8,9 +8,10 @@ import { Bullseye, Spinner } from '@patternfly/react-core';
 import { api } from '@app/utils/vpnrpc_settings';
 import { BackgroundImage } from '@patternfly/react-core';
 
-export let userGlobal = "";
-export let ddnsGlobal = "";
-export let azureGlobal = "";
+export let userGlobal = "Unknown";
+export let ddnsHostnameGlobal = "";
+export let ddnsProxy: boolean;
+export let azureGlobal: boolean;
 export let capsListGlobal = [];
 export let isTapSupported: boolean;
 export let isBridgeMode: boolean;
@@ -44,6 +45,7 @@ class LoadingPageBackground extends React.Component {
       xs2x: '/images/pfbg_576@2x.jpg'
     };
   }
+
   render() {
     return (
       <BackgroundImage src={this.images} />
@@ -85,7 +87,7 @@ class SoftetherRouter extends React.Component {
 
   componentDidMount(){
     api.EnumConnection()
-    .then( response => {
+    .then( () => {
       // console.log(response)
       userGlobal = "Administrator"
       this.setState({ loadingAdmin: false });
@@ -104,9 +106,9 @@ class SoftetherRouter extends React.Component {
               delete route["label"];
             }
           });
+          userGlobal = "Hub Administrator";
       }
-      userGlobal = "Hub Administrator";
-      this.setState({ loadingAdmin: false, user: "Hub Administrator"});
+      this.setState({ loadingAdmin: false });
       console.log(error)
     });
 
@@ -150,14 +152,12 @@ class SoftetherRouter extends React.Component {
 
     api.GetDDnsClientStatus()
     .then( response => {
-      ddnsGlobal = response.CurrentFqdn_str;
-      let ag = response.CurrentHostName_str;
+      ddnsHostnameGlobal = response.CurrentHostName_str;
 
       api.GetAzureStatus()
       .then( response => {
-        if(response.IsEnabled_bool){
-          azureGlobal = ag.concat(".vpnazure.net");
-        }
+        azureGlobal = response.IsEnabled_bool;
+
         this.setState({ loadigDDNSAzure: false });
         // console.log(azureGlobal)
         // console.log(ddnsGlobal)
@@ -179,15 +179,31 @@ class SoftetherRouter extends React.Component {
       isTapSupported = response.caps_b_tap_supported_u32 == 1;// assign isTapSupported
       isBridgeMode = response.caps_b_bridge_u32 == 1;
       isV4 = response.caps_b_vpn4_u32 == 1;
+      ddnsProxy = response.caps_b_support_ddns_proxy_u32 == 1;
 
       // hide local bridge functionality
-      if(response.caps_b_local_bridge_u32 != 1){
+      if(response.caps_b_local_bridge_u32 == 0){
         deleteLabel("Local Bridge")
       }
 
       // hide cluster functionality
-      if(response.caps_b_support_cluster_u32 != 1){
+      if(response.caps_b_support_cluster_u32 == 0){
         deleteLabel("Clustering Configuration")
+      }
+
+      // hide layer 3
+      if(response.caps_b_support_layer3_u32 == 0){
+        deleteLabel("Layer 3 Switch")
+      }
+
+      // hide azure
+      if(response.caps_b_support_azure_u32 == 0){
+        deleteLabel("VPN Azure")
+      }
+
+      // hide ddns
+      if(response.caps_b_support_ddns_u32 == 0){
+        deleteLabel("Dynamic DNS")
       }
 
       if(isBridgeMode){

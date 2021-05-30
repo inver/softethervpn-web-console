@@ -60,7 +60,7 @@ class ConfigTextArea extends React.Component {
 
   renderConfig = config => {
     if (config != null){
-      let config_text = atob(config.FileData_bin.toString()).slice(3);
+      const config_text = atob(config.FileData_bin.toString()).slice(3);
       return (
         <TextArea className="config-textarea-tall" value={config_text} aria-label="Edit Config Text" isReadOnly autoResize />
       );
@@ -115,9 +115,9 @@ class ConfigFileUpload extends React.Component {
   }
 
   confirmUpload = (value, filename) => {
-    let bin = new TextEncoder().encode(value);
+    const bin = new TextEncoder().encode(value);
     // console.log(bin)
-    let conf: VPN.VpnRpcConfig = new VPN.VpnRpcConfig(
+    const conf: VPN.VpnRpcConfig = new VPN.VpnRpcConfig(
       {
         FileData_bin: bin,
       });
@@ -157,7 +157,7 @@ class ConfigFileUpload extends React.Component {
       <FileUpload id="config-file" value={value} filename={filename} onChange={this.handleFileChange} type='text' hideDefaultPreview/>
       </FormGroup>
       <ActionGroup>
-        <Button isDisabled={this.state.empty} onClick={() => this.fileUpload(value, filename)}>Upload Configuration File</Button>
+        <Button isDisabled={empty} onClick={() => this.fileUpload(value, filename)}>Upload Configuration File</Button>
         <Button onClick={() => this.fileDownload()}>Download Configuration File</Button>
         <Modal
           variant={ModalVariant.small}

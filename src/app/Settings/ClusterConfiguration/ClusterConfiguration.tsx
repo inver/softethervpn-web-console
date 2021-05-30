@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Text,
   Title,
-  Page,
   PageSection,
   PageSectionVariants,
   Form,
@@ -13,8 +12,6 @@ import {
   StackItem,
   Alert,
   Radio,
-  Grid,
-  GridItem,
   Checkbox,
   Flex,
   FlexItem,
@@ -117,8 +114,8 @@ class ClusterForm extends React.Component {
     };
 
     this.handleIpInputChange = ip_addr => {
-      let re = new RegExp('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
-      let valid = (re.test(ip_addr) || ip_addr === "") ? 'default' : ValidatedOptions.error ;
+      const re = new RegExp('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
+      const valid = (re.test(ip_addr) || ip_addr === "") ? 'default' : ValidatedOptions.error ;
       this.setState({ ip_addr: ip_addr, ip_valid: valid })
       if(valid == ValidatedOptions.error){
         this.setState({form_valid: false})
@@ -137,12 +134,12 @@ class ClusterForm extends React.Component {
       }
       let test = true;
       splitted.forEach(el => {
-        let num = Number(el)
+        const num = Number(el)
         if( isNaN(num) || num < 1 || num > 65535 ){
           test = false;
         }
       });
-      let valid = test ? 'default' : ValidatedOptions.error ;
+      const valid = test ? 'default' : ValidatedOptions.error ;
       this.setState({ ports: ports, ports_valid: valid })
       if(valid == ValidatedOptions.error){
         this.setState({form_valid: false})
@@ -155,7 +152,7 @@ class ClusterForm extends React.Component {
     };
 
     this.handleHostChange = host => {
-      let valid = host === "" ? ValidatedOptions.error : 'default';
+      const valid = host === "" ? ValidatedOptions.error : 'default';
       this.setState({ host: host, host_valid: valid })
       if(valid == ValidatedOptions.error){
         this.setState({form_valid: false})
@@ -178,7 +175,7 @@ class ClusterForm extends React.Component {
     };
 
     this.UploadChanges = () => {
-      let config: VPN.VpnRpcFarm = new VPN.VpnRpcFarm({
+      const config: VPN.VpnRpcFarm = new VPN.VpnRpcFarm({
         ServerType_u32: this.state.mode
       });
 
@@ -202,7 +199,7 @@ class ClusterForm extends React.Component {
         config.Weight_u32 = this.state.ratio;
       }
 
-      api.SetFarmSetting(config).then(response => {
+      api.SetFarmSetting(config).then( () => {
         setTimeout(() => {
           window.location.reload();
         }, 1500);
@@ -430,7 +427,6 @@ class ClusterForm extends React.Component {
             inputAriaLabel="controller-port"
             minusBtnAriaLabel="minus"
             plusBtnAriaLabel="plus"
-            //onChange={this.handleTextInputChange2}
           />
       </FormGroup>
       </FlexItem>
@@ -463,7 +459,7 @@ class ClusterForm extends React.Component {
       </Stack>
       <Modal
           variant={ModalVariant.small}
-          title="Small modal header"
+          title="The Server will restart"
           titleIconVariant="warning"
           isOpen={isModalOpen}
           onClose={this.handleModalToggle}
@@ -480,7 +476,7 @@ class ClusterForm extends React.Component {
         You are about to change the clustering configuration.<br/><br/>
         When you change the clustering configuration, all currently connected sessions and connections for management purposes (including this management connection) will be disconnected and the server program will restart.<br/>
         When there are many server users, it could take over a minute to start.<br/><br/>
-        Click 'Continue' to automatically disconnect the connection with the server. To continue management, you will need to reconnect to the server.
+        Click &ldquo;Continue&rdquo; to automatically disconnect the connection with the server. To continue management, you will need to reconnect to the server.
         </p>
         </Modal>
       </React.Fragment>

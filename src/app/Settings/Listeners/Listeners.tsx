@@ -17,7 +17,6 @@ import {
   TextContent,
   Divider,
   Card,
-  CardHeader,
   CardBody,
   CardFooter,
   CardTitle,
@@ -110,13 +109,13 @@ class ListenersCard extends React.Component {
 
     this.handleCreateClick = () =>
     {
-      let param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
+      const param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
         Port_u32: this.state.newport,
         Enable_bool: true,
       });
 
       api.CreateListener(param)
-      .then( response => {
+      .then( () => {
         this.setState({ loading: true, isModalOpen: false });
       })
       .catch( error => {
@@ -126,12 +125,12 @@ class ListenersCard extends React.Component {
 
     this.handleDeleteClick = () =>
     {
-      let param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
+      const param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
         Port_u32: Number(this.state.selectedDataListItemId)
       });
 
       api.DeleteListener(param)
-      .then( response => {
+      .then( () => {
         this.setState({ loading: true });
       })
       .catch( error => {
@@ -141,13 +140,13 @@ class ListenersCard extends React.Component {
 
     this.handleStartClick = () =>
     {
-      let param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
+      const param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
         Port_u32: Number(this.state.selectedDataListItemId),
         Enable_bool: true,
       });
 
       api.EnableListener(param)
-      .then( response => {
+      .then( () => {
         this.setState({ loading: true });
       })
       .catch( error => {
@@ -157,13 +156,13 @@ class ListenersCard extends React.Component {
 
     this.handleStopClick = () =>
     {
-      let param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
+      const param: VPN.VpnRpcListener = new VPN.VpnRpcListener({
         Port_u32: Number(this.state.selectedDataListItemId),
         Enable_bool: false,
       });
 
       api.EnableListener(param)
-      .then( response => {
+      .then( () => {
         this.setState({ loading: true });
       })
       .catch( error => {
@@ -182,10 +181,10 @@ class ListenersCard extends React.Component {
   {
     api.EnumListener()
     .then( response => {
-      let rows = [];
-      let listeners = {};
+      const rows = [];
+      const listeners = {};
       let lastport = 1;
-      let portList = [];
+      const portList = [];
 
       response.ListenerList.forEach( listener => {
         if(listener.Ports_u32 > lastport && listener.Ports_u32 < this.maxValue){
@@ -204,7 +203,7 @@ class ListenersCard extends React.Component {
           status = "Stopped";
         }
 
-        let row =
+        const row =
           <DataListItem aria-labelledby={"selectable-action-"+listener.Ports_u32.toString()} id={listener.Ports_u32.toString()} key={listener.Ports_u32.toString() + " key"}>
                 <DataListItemRow>
                   <DataListItemCells
@@ -241,7 +240,7 @@ class ListenersCard extends React.Component {
 
 
   render(){
-    const { loading, selectedDataListItemId, rowsList, listenerState, isModalOpen, newport, portList } = this.state;
+    const { selectedDataListItemId, rowsList, listenerState, isModalOpen, newport, portList } = this.state;
 
     return(
       <React.Fragment>

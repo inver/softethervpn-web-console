@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { PageSection, Title, Stack, StackItem } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
-import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { split_string_by_capitalization, mode_to_string } from '@app/utils/string_utils';
 import { api } from '@app/utils/vpnrpc_settings';
@@ -45,7 +44,6 @@ class AboutThisServerTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
       rows: loading_rows
     };
   }
@@ -60,8 +58,8 @@ class AboutThisServerTable extends React.Component {
         }
         rows.push({cells: [split_string_by_capitalization(key), value], props: { colSpan: 8 }})
       });
-      
-        let tail = []
+
+        const tail = []
 
         capsListGlobal.forEach(cap => {
           let capval = cap.CapsValue_u32;
@@ -85,7 +83,7 @@ class AboutThisServerTable extends React.Component {
 
         });
         rows = rows.concat(tail);
-        this.setState({ loading: false, rows: rows });
+        this.setState({ rows: rows });
     }).catch( error => {
       console.log(error)
     });
@@ -93,7 +91,7 @@ class AboutThisServerTable extends React.Component {
 
 
   render() {
-    const { loading, rows } = this.state;
+    const { rows } = this.state;
 
     return (
       <React.Fragment>

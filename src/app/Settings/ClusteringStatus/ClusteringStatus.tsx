@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Title,
-  Page,
   PageSection,
   PageSectionVariants,
   Stack,
@@ -13,18 +12,15 @@ import {
   Button,
   Modal,
   ModalVariant,
-  TextArea,
-  Form
 } from '@patternfly/react-core';
 import {
   Table,
   TableHeader,
   TableBody,
-  TableVariant,
   RowSelectVariant,
 } from '@patternfly/react-table';
 import { api } from '@app/utils/vpnrpc_settings';
-import { split_string_by_capitalization, mode_to_string } from '@app/utils/string_utils';
+import { split_string_by_capitalization } from '@app/utils/string_utils';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 import { ViewCertModal } from '@app/CertificateViewer/CertificateViewer';
 
@@ -61,9 +57,10 @@ class RenderTable extends React.Component {
   componentDidMount(){
     api.GetFarmSetting()
     .then( response => {
-      this.setState({ loading:false, mode: response.ServerType_u32 })
+      this.setState({ loading: false, mode: response.ServerType_u32 })
     })
     .catch( error => {
+      console.log(error)
       this.setState({ loading: false })
     });
   }
@@ -84,7 +81,7 @@ class RenderTable extends React.Component {
       </React.Fragment>
     );
   }
-};
+}
 
 
 class MemberStatus extends React.Component {
@@ -98,7 +95,6 @@ class MemberStatus extends React.Component {
       idList: [],
       isModalOpen: false,
       selectedId: null,
-      memberLoading: true,
       memberCols: ['Item', 'Value'],
       memberRows: loading_rows,
       isCertificateModalOpen: false,
@@ -108,30 +104,29 @@ class MemberStatus extends React.Component {
     this.onSelect = this.onSelect.bind(this);
     this.refresh = () => {
       this.setState({
-        loading: true,
         rows: loading_rows,
-        idList: [],
         selectedId: null,
       });
+      this.loadList();
     };
 
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
         isModalOpen: !isModalOpen
       }));
-
+      this.modalUpdate()
     };
   }
 
-  modalUpdate(selectedId){
-    this.setState({ memberLoading: true, memberRows: loading_rows });
-    let arg: VPN.VpnRpcFarmInfo = new VPN.VpnRpcFarmInfo({
-      Id_u32: selectedId,
+  modalUpdate(){
+    this.setState({ memberRows: loading_rows });
+    const param: VPN.VpnRpcFarmInfo = new VPN.VpnRpcFarmInfo({
+      Id_u32: this.state.selectedId,
     });
 
-    api.GetFarmInfo(arg)
+    api.GetFarmInfo(param)
     .then( response => {
-      let rows = [];
+      const rows = [];
       let cert = "";
       Object.keys(response).forEach(key => {
         // console.log(typeof response[key])
@@ -150,6 +145,7 @@ class MemberStatus extends React.Component {
             let counter = 1;
             response[key].forEach(hub => {
               rows.push(["Hub (" + hub.DynamicHub_bool ? "Dynamic" : "Static" + ") #" + counter.toString(), hub.HubName_str]);
+              counter ++;
             });
           }
         }
@@ -174,21 +170,23 @@ class MemberStatus extends React.Component {
   loadList(){
     api.EnumFarmMember()
     .then( response => {
-      let rows = [];
-      let ids = [];
-      response.FarmMemberList.forEach(member => {
-        let row = []
-        row.push(member.Controller_bool ? "Controller" : "Member");
-        row.push(member.ConnectedTime_dt);
-        row.push(member.Hostname_str);
-        row.push(member.Point_u32);
-        row.push(member.NumSessions_u32);
-        row.push(member.NumTcpConnections_u32);
-        row.push(member.NumHubs_u32);
-        row.push(member.AssignedClientLicense_u32);
-        row.push(member.AssignedBridgeLicense_u32);
-        rows.push(row);
-        ids.push(member.Id_u32);
+      const rows = response.FarmMemberList.map((member) => {
+        const row = [
+          member.Controller_bool ? "Controller" : "Member",
+          member.ConnectedTime_dt,
+          member.Hostname_str,
+          member.Point_u32,
+          member.NumSessions_u32,
+          member.NumTcpConnections_u32,
+          member.NumHubs_u32,
+          member.AssignedClientLicense_u32,
+          member.AssignedBridgeLicense_u32
+        ];
+        return row;
+      });
+
+      const ids = response.FarmMemberList.map((member) => {
+        return member.Id_u32;
       });
 
       this.setState({ loading: false, rows: rows, idList: ids });
@@ -202,16 +200,11 @@ class MemberStatus extends React.Component {
     this.loadList();
   }
 
-  componentDidUpdate(){
-    if(this.state.loading){
-      this.loadList();
-    }
-  }
 
   onSelect(event, isSelected, rowId) {
     // console.log(this.state.idList)
     let id = null;
-    let rows = this.state.rows.map((oneRow, index) => {
+    const rows = this.state.rows.map((oneRow, index) => {
       oneRow.selected = rowId === index;
       if(rowId === index){
         id = this.state.idList[index];
@@ -222,11 +215,10 @@ class MemberStatus extends React.Component {
       rows: rows,
       selectedId: id
     });
-    this.modalUpdate(id);
   }
 
   render(){
-    const { loading, columns, rows, isModalOpen, idList, selectedId, memberLoading, memberCols, memberRows, selectedCert } = this.state;
+    const { loading, columns, rows, isModalOpen, selectedId, memberCols, memberRows, selectedCert } = this.state;
 
     return (
       <React.Fragment>
@@ -240,7 +232,6 @@ class MemberStatus extends React.Component {
         aria-label="Member Status Table"
         variant='compact'
         selectVariant={RowSelectVariant.radio}
-        aria-label="Selectable Table"
         cells={columns}
         rows={rows}
       >
@@ -254,10 +245,10 @@ class MemberStatus extends React.Component {
         <Button onClick={this.handleModalToggle} isDisabled={selectedId == null}>Cluster Member Informations</Button>
         </FlexItem>
         <FlexItem>
-        <ViewCertModal buttonText="View Server Certificate" isDisabled={selectedId == null} certBin={this.state.selectedCert}/>
+        <ViewCertModal buttonText="View Server Certificate" isDisabled={selectedId == null} certBin={selectedCert}/>
         </FlexItem>
         <FlexItem>
-        <Button variant='secondary' onClick={this.refresh}>Refresh</Button>
+        <Button variant='secondary' onClick={this.refresh} isLoading={loading}>Refresh</Button>
         </FlexItem>
       </Flex>
       </StackItem>
@@ -271,7 +262,7 @@ class MemberStatus extends React.Component {
             <Button key="close" variant="primary" onClick={this.handleModalToggle}>
               Close
             </Button>,
-            <Button key="refresh" variant="secondary" onClick={() => this.modalUpdate(selectedId)}>
+            <Button key="refresh" variant="secondary" onClick={() => this.modalUpdate()}>
               Refresh
             </Button>
           ]}
@@ -299,13 +290,14 @@ class ControllerStatus extends React.Component {
 
     this.refresh = () => {
       this.setState({ loading: true, rows: loading_rows })
+      this.loadFarmStatus()
     }
   }
 
-  componentDidMount(){
+  loadFarmStatus(){
     api.GetFarmConnectionStatus()
     .then( response => {
-      let rows = []
+      const rows = []
       Object.keys(response).forEach( key => {
         rows.push([split_string_by_capitalization(key), response[key].toString()]);
       });
@@ -317,21 +309,8 @@ class ControllerStatus extends React.Component {
     });
   }
 
-  componentDidUpdate(){
-    if(this.state.loading){
-      api.GetFarmConnectionStatus()
-      .then( response => {
-        let rows = []
-        Object.keys(response).forEach( key => {
-          rows.push([split_string_by_capitalization(key), response[key].toString()]);
-        });
-
-        this.setState({ loading: false, rows: rows });
-      })
-      .catch( error => {
-        console.log(error)
-      });
-    }
+  componentDidMount(){
+    this.loadFarmStatus()
   }
 
   render(){
@@ -346,7 +325,7 @@ class ControllerStatus extends React.Component {
           <Title headingLevel="h2" size="sm">Cluster Controller Status</Title>
           </FlexItem>
           <FlexItem>
-            <Button variant="secondary" isSmall onClick={this.refresh}>Refresh</Button>
+            <Button variant="secondary" isSmall onClick={this.refresh} isLoading={loading}>Refresh</Button>
           </FlexItem>
         </Flex>
         </StackItem>

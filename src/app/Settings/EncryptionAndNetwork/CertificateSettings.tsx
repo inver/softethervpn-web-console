@@ -3,9 +3,6 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardTitle,
-  CardFooter,
-  Bullseye,
   Spinner,
   Stack,
   StackItem,
@@ -27,7 +24,7 @@ import * as x509 from "../../../../node_modules/@peculiar/x509";
 import { crt_field2object } from '@app/utils/string_utils';
 import { ViewCertModal } from '@app/CertificateViewer/CertificateViewer';
 import { downloadBlob } from '@app/utils/blob_utils';
-import { ddnsGlobal, userGlobal } from '@app/index';
+import { ddnsHostnameGlobal, userGlobal } from '@app/index';
 
 function formatKey(key: string): strings
 {
@@ -48,12 +45,13 @@ function formatKey(key: string): strings
 }
 
 class ServerCertificateCard extends React.Component {
-  constructor(props){
+  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
 
     this.state = {
       loading: true,
       certBin: "",
+      cert: {},
       keyBin: "",
       isUploadModalOpen: false,
       certValue: "",
@@ -64,6 +62,9 @@ class ServerCertificateCard extends React.Component {
       keyValid: "default",
       isNewCertModalOpen: false,
       cnValue: "",
+      issuedTo: "",
+      issuedBy: "",
+      expDate: ""
     }
 
     this.handleUploadModalToggle = () => {
@@ -78,7 +79,7 @@ class ServerCertificateCard extends React.Component {
       }));
     };
 
-    this.handleCertFileChange = (certValue, certFilename, event) => {
+    this.handleCertFileChange = (certValue, certFilename) => {
       if(certFilename != ""){
         certValue.text().then(value => {
           let valid = "default"
@@ -116,7 +117,7 @@ class ServerCertificateCard extends React.Component {
 
     };
 
-    this.handleKeyFileChange = (keyValue, keyFilename, event) => {
+    this.handleKeyFileChange = (keyValue, keyFilename) => {
       if(keyFilename != ""){
         keyValue.text().then(value => {
           let valid = "default"
@@ -156,13 +157,13 @@ class ServerCertificateCard extends React.Component {
 
         this.state.keyValue.text().then( valueKey => {
 
-          let param: VPN.VpnRpcKeyPair = new VPN.VpnRpcKeyPair({
+          const param: VPN.VpnRpcKeyPair = new VPN.VpnRpcKeyPair({
             Cert_bin: new TextEncoder().encode(valueCert),
             Key_bin: new TextEncoder().encode(valueKey),
           });
 
           api.SetServerCert(param)
-          .then(response => {
+          .then( () => {
             this.setState({ loading: true,
               isUploadModalOpen: false, certValue: "",
               certFilename: "",
@@ -186,41 +187,53 @@ class ServerCertificateCard extends React.Component {
 
     this.handleNewCert = () => {
 
-      let param: VPN.VpnRpcTest = new VPN.VpnRpcTest({
+      const param: VPN.VpnRpcTest = new VPN.VpnRpcTest({
         StrValue_str: this.state.cnValue
       });
 
       api.RegenerateServerCert(param)
-      .then( response => {
+      .then( () => {
         this.setState({ isNewCertModalOpen: false })
-        window.location.reload();
+        window.location.reload(); // reload because the server cert is changed
       })
       .catch(error => {
         console.log(error)
       });
-    }
+    };
+
+    this.downloadCertAndKey = () => {
+      const certAndKey = this.state.cert.toString()
+      if(userGlobal != "Hub Administrator"){
+        certAndKey = certAndKey.concat("\n");
+        certAndKey = certAndKey.concat(formatKey(this.state.keyBin));
+      }
+
+      downloadBlob(new Blob([certAndKey], { type: "text/plain"}), this.state.issuedTo + ".pem")
+    };
   }
 
-
-  componentDidMount(){
+  loadCert(): void {
     api.GetServerCert()
     .then( response => {
+      let cn: string;
+      const certificate = new x509.X509Certificate(response.Cert_bin);
 
-      let cn = ""
-
-      if(ddnsGlobal != ""){
-        cn = ddnsGlobal;
+      if( ddnsHostnameGlobal != ""){
+        cn = ddnsHostnameGlobal;
       }
       else{
-        let certificate = new x509.X509Certificate(response.Cert_bin);
         cn = crt_field2object(certificate.subject)["CN"];
       }
 
       this.setState({
         loading: false,
+        cert: certificate,
         certBin: response.Cert_bin,
         keyBin: response.Key_bin,
-        cnValue: cn
+        cnValue: cn,
+        issuedTo: crt_field2object(certificate.subject)["CN"],
+        issuedBy: crt_field2object(certificate.issuer)["CN"],
+        expDate: certificate.notAfter.toLocaleDateString()
       });
 
     })
@@ -229,49 +242,29 @@ class ServerCertificateCard extends React.Component {
     });
   }
 
-  componentDidUpdate(){
-    if(this.state.loading){
-      api.GetServerCert()
-      .then( response => {
-        this.setState({
-          loading: false,
-          certBin: response.Cert_bin,
-          keyBin: response.Key_bin
-        });
-      })
-      .catch( error => {
-        console.log(error)
-      });
-    }
+  componentDidMount(): void {
+    this.loadCert()
   }
 
-  render(){
-    const { loading, certBin, keyBin, isUploadModalOpen, certValue, certFilename, keyValue, keyFilename, certValid, keyValid, isNewCertModalOpen, cnValue } = this.state;
 
-    let issuedTo = ""
-    let issuedBy = ""
-    let expDate = ""
-    let certAndKey = ""
+  render(): React.Component {
+    const {
+      loading,
+      certBin,
+      isUploadModalOpen,
+      certValue,
+      certFilename,
+      keyValue,
+      keyFilename,
+      certValid,
+      keyValid,
+      isNewCertModalOpen,
+      cnValue,
+      issuedTo,
+      issuedBy,
+      expDate
+    } = this.state;
 
-    if(certBin != ""){
-      let cert = new x509.X509Certificate(certBin);
-      if(userGlobal != "Hub Administrator"){
-        certAndKey = certAndKey.concat(cert.toString());
-        certAndKey = certAndKey.concat("\n");
-        certAndKey = certAndKey.concat(formatKey(keyBin));
-      }
-      
-
-      issuedTo = crt_field2object(cert.subject)["CN"];
-      issuedBy = crt_field2object(cert.issuer)["CN"];
-      expDate = cert.notAfter.toLocaleDateString();
-
-      const downloadCertKey = () => {
-        downloadBlob(new Blob([certAndKey], { type: "text/plain"}), issuedTo + ".pem")
-        // console.log(name)
-      }
-
-    }
 
     return(
       <React.Fragment>
@@ -300,7 +293,7 @@ class ServerCertificateCard extends React.Component {
           <React.Fragment>
           <Button variant="primary" onClick={this.handleNewCertModalToggle}>New Certificate</Button>
           <Button variant="primary" onClick={this.handleUploadModalToggle}>Upload Certificate</Button>
-          <Button variant="primary" onClick={downloadCertKey}>Download Certificate and Key</Button>
+          <Button variant="primary" onClick={this.downloadCertAndKey}>Download Certificate and Key</Button>
           </React.Fragment>
           }
           <ViewCertModal buttonText="View" certBin={certBin}/>

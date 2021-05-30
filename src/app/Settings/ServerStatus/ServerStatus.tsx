@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { PageSection, Title, Stack, StackItem, Button, Flex, FlexItem} from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
-import { ToggleGroup, ToggleGroupItem } from '@patternfly/react-core';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { split_string_by_capitalization } from '@app/utils/string_utils';
 import { api } from '@app/utils/vpnrpc_settings';
@@ -35,9 +34,9 @@ class ServerStatusTable extends React.Component {
     this.state = { loading: true, columns: ['Item', 'Value'], rows: loading_rows };
   }
 
-  componentDidMount() {
+  loadServerStatus(){
     api.GetServerStatus().then(response => {
-      let rows =[];
+      const rows =[];
       Object.keys(response).forEach( key => {
         rows.push([split_string_by_capitalization(key), response[key]])
       })
@@ -45,19 +44,17 @@ class ServerStatusTable extends React.Component {
     });
   }
 
+  componentDidMount() {
+    this.loadServerStatus()
+  }
+
   componentDidUpdate(){
     if(this.state.loading){
-      api.GetServerStatus().then(response => {
-        let rows =[];
-        Object.keys(response).forEach( key => {
-          rows.push([split_string_by_capitalization(key), response[key]])
-        })
-        this.setState({ loading: false, rows: rows })
-      });
+      this.loadServerStatus()
     }
   }
 
-  reloadList = loading => {
+  reloadList = () => {
     this.setState({ loading: true, rows: loading_rows })
   };
 
