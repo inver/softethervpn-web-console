@@ -76,6 +76,10 @@ class AzureComponent extends React.Component {
 
       this.setState({ isChecked });
     };
+
+    this.redirectToDDNS = () => {
+      window.location = window.location.toString().replace("vpnazure", "ddns");
+    };
   }
 
   loadHostname(){
@@ -139,7 +143,7 @@ class AzureComponent extends React.Component {
         </Text>
         </StackItem>
         <StackItem>
-        <Button onClick={() => window.location = "/#/functionalities/ddns"}>Change Hostname</Button>
+        <Button onClick={this.redirectToDDNS}>Change Hostname</Button>
         </StackItem>
         </React.Fragment>
         :

@@ -16,6 +16,9 @@ export let capsListGlobal = [];
 export let isTapSupported: boolean;
 export let isBridgeMode: boolean;
 export let isV4: boolean;
+export let isIpsecCapable: boolean;
+export let isOpenVPNSupported: boolean;
+export let isSSTPSupported: boolean;
 
 function deleteLabel(label: string) {
   routes.forEach((route) => {
@@ -179,6 +182,9 @@ class SoftetherRouter extends React.Component {
         isBridgeMode = response.caps_b_bridge_u32 == 1;
         isV4 = response.caps_b_vpn4_u32 == 1;
         ddnsProxy = response.caps_b_support_ddns_proxy_u32 == 1;
+        isIpsecCapable = response.caps_b_support_ipsec_u32 == 1;
+        isOpenVPNSupported = response.caps_b_support_openvpn_u32 == 1;
+        isSSTPSupported = response.caps_b_support_sstp_u32 == 1;
 
         // hide local bridge functionality
         if (response.caps_b_local_bridge_u32 == 0) {
@@ -205,16 +211,21 @@ class SoftetherRouter extends React.Component {
           deleteLabel('Dynamic DNS');
         }
 
+        // hide legacy Protocols
+        if(!isIpsecCapable && !isOpenVPNSupported && !isSSTPSupported){
+          deleteLabel('Legacy Protocols')
+        }
+
         if (isBridgeMode) {
           routes.forEach((route) => {
             if (isIAppRouteGroup(route)) {
               route.routes.forEach((subroute) => {
-                if (subroute.isBridge === true) {
+                if (subroute.isBridge === false) {
                   delete subroute['label'];
                 }
               });
             } else {
-              if (route.isBridge === true) {
+              if (route.isBridge === false) {
                 delete route['label'];
               }
             }

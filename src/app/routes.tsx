@@ -5,6 +5,8 @@ import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Support } from '@app/Support/Support';
 import { LocalBridge } from '@app/Functionalities/LocalBridge/LocalBridge';
 import { Layer3Switch } from '@app/Functionalities/Layer3Switch/Layer3Switch';
+import { LegacyProtocols } from '@app/Functionalities/LegacyProtocols/LegacyProtocols';
+import { EtherIPDetailed } from '@app/Functionalities/LegacyProtocols/EtherIP';
 import { DynDNS } from '@app/Functionalities/DDNS/DDNS';
 import { VpnAzure } from '@app/Functionalities/VPNAzure/VPNAzure';
 import { Listeners } from '@app/Settings/Listeners/Listeners';
@@ -77,6 +79,23 @@ const routes: AppRouteConfig[] = [
         label: 'Layer 3 Switch',
         path: '/functionalities/layer3switch',
         title: 'SoftEther VPN Console | Layer 3 Switch',
+        isBridge: false
+      },
+      {
+        component: LegacyProtocols,
+        exact: true,
+        isAsync: true,
+        label: 'Legacy Protocols',
+        path: '/functionalities/legacyprotocols',
+        title: 'SoftEther VPN Console | Legacy Protocols',
+        isBridge: false
+      },
+      {
+        component: EtherIPDetailed,
+        exact: true,
+        isAsync: true,
+        path: '/functionalities/legacyprotocols/etherip',
+        title: 'SoftEther VPN Console | EtherIP / L2TPv3 detailed settings',
       },
       {
         component: DynDNS,
@@ -85,6 +104,7 @@ const routes: AppRouteConfig[] = [
         label: 'Dynamic DNS',
         path: '/functionalities/ddns',
         title: 'SoftEther VPN Console | Dynamic DNS',
+        isBridge: false
       },
       {
         component: VpnAzure,
@@ -93,6 +113,7 @@ const routes: AppRouteConfig[] = [
         label: 'VPN Azure',
         path: '/functionalities/vpnazure',
         title: 'SoftEther VPN Console | VPN Azure',
+        isBridge: false
       },
     ],
     isAdmin: true,
@@ -125,7 +146,7 @@ const routes: AppRouteConfig[] = [
         path: '/settings/clusterconfig',
         title: 'SoftEther VPN Console | Clustering Configuration',
         isAdmin: true,
-        isBridge: true,
+        isBridge: false,
       },
       {
         component: ClusteringStatus,
