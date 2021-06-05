@@ -43,7 +43,7 @@ const ConnectionsList: React.FunctionComponent = () => (
   <Stack hasGutter>
     <StackItem>
       <Title headingLevel="h1" size="lg">
-        Edit Config File
+        List of TCP / IP Connections
       </Title>
     </StackItem>
     <ConnectionsTable />
