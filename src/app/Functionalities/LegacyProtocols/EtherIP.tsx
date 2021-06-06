@@ -285,6 +285,9 @@ class IPSecPhase1 extends React.Component {
       isHubOpen
     } = this.state;
 
+    const isConfirmDisabled = modalID == "" || modalUser == "";
+    const idHelper = "The ID must be exactly the same as an ID in the configuration of the EtherIP / L2TPv3 Client. You can either specify IP address or characters as ID, if the EtherIP / L2TPv3 Client uses an IP address as Phase 1 ID. You can specify '*' (asterisk) as a wildcard to match any other client which does not match other explicit rule.";
+
     return (
       <React.Fragment>
       <Card isFullHeight>
@@ -317,7 +320,7 @@ class IPSecPhase1 extends React.Component {
           isOpen={isModalOpen}
           showClose={false}
           actions={[
-            <Button key="confirm" variant="primary" onClick={this.onConfirmClick}>
+            <Button key="confirm" variant="primary" onClick={this.onConfirmClick} isDisabled={isConfirmDisabled}>
               Confirm
             </Button>,
             <Button key="cancel" variant="link" onClick={this.handleModalToggle}>
@@ -336,7 +339,7 @@ class IPSecPhase1 extends React.Component {
           </StackItem>
           <StackItem>
           <Form isHorizontal>
-            <FormGroup label="ISAKMP Phase 1 ID">
+            <FormGroup label="ISAKMP Phase 1 ID" helperText={idHelper}>
               <TextInput value={modalID} type="text" onChange={this.handleIDTextInputChange} aria-label="ISAKMP input" />
             </FormGroup>
             <FormGroup label="Virtual Hub">
