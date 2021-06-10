@@ -4,8 +4,6 @@ import {
   Modal,
   ModalVariant,
 } from '@patternfly/react-core';
-import { api } from '@app/utils/vpnrpc_settings';
-import * as VPN from "vpnrpc/dist/vpnrpc";
 
 // props are 'buttonText', 'modalText', 'onConfirm', 'isDisabled', and optionally 'externalToggle' which prevent the button from rendering
 class DeletionModal extends React.Component {
