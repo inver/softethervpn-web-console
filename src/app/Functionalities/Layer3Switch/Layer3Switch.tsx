@@ -467,12 +467,14 @@ class DefinedVL3SCard extends React.Component {
     let isAddRouteDisabled: boolean;
     let isDelIfDisabled: boolean;
     let isDelRouteDisabled: boolean;
+    let deleteText = "";
     if(selectedSwitch != null){
       isAddIfDisabled = selectedSwitch.cells[1] == "Running";
       isAddRouteDisabled = selectedSwitch.cells[1] == "Running";
       isDelIfDisabled = selectedSwitch.cells[1] == "Running" || !isIfSelected;
       isDelRouteDisabled = selectedSwitch.cells[1] == "Running" || !isRouteSelected;
-      const deleteName = selectedSwitch.cells[0];
+      deleteText = <Text>This will delete the Virtual Layer 3 Switch &ldquo;{selectedSwitch.cells[0]}&rdquo;.<br/>
+      Are you sure?</Text>
     }
     else{
       isAddIfDisabled = true;
@@ -481,8 +483,7 @@ class DefinedVL3SCard extends React.Component {
       isDelRouteDisabled = true;
     }
 
-    const deleteText = <Text>This will delete the Virtual Layer 3 Switch &ldquo;{deleteName}&rdquo;.<br/>
-    Are you sure?</Text>
+
 
     return(
       <React.Fragment>
