@@ -13,6 +13,7 @@ export let ddnsHostnameGlobal = '';
 export let ddnsProxy: boolean;
 export let azureGlobal: boolean;
 export let capsListGlobal = [];
+export let infoListGlobal = [];
 export let isTapSupported: boolean;
 export let isBridgeMode: boolean;
 export let isV4: boolean;
@@ -28,6 +29,11 @@ function deleteLabel(label: string) {
           delete subroute['label'];
         }
       });
+    }
+    else{
+      if(route.label == label){
+        delete route['label'];
+      }
     }
   });
 }
@@ -81,6 +87,7 @@ class SoftetherRouter extends React.Component {
       loadingCluster: true,
       loadigDDNSAzure: true,
       loadingCaps: true,
+      loadingInfo: true
     };
   }
 
@@ -116,6 +123,7 @@ class SoftetherRouter extends React.Component {
       .GetFarmSetting()
       .then((response) => {
         if (response.ServerType_u32 == 1 || response.ServerType_u32 == 2) {
+
           routes.forEach((route) => {
             if (isIAppRouteGroup(route)) {
               route.routes.forEach((subroute) => {
@@ -238,11 +246,26 @@ class SoftetherRouter extends React.Component {
         console.log(error);
         this.setState({ loadingCaps: false });
       });
+
+      api.GetServerInfo()
+      .then(response => {
+        infoListGlobal = response;
+
+        if(response.ServerType_u32 == 2){
+          deleteLabel("Hubs")
+        }
+
+        this.setState({ loadingInfo: false });
+      })
+      .catch((error) => {
+        console.log(error);
+        this.setState({ loadingInfo: false });
+      });
   } // componentDidMount
 
   render() {
-    const { loadingAdmin, loadingCluster, loadigDDNSAzure, loadingCaps } = this.state;
-    const loading = loadingAdmin || loadingCluster || loadigDDNSAzure || loadingCaps;
+    const { loadingAdmin, loadingCluster, loadigDDNSAzure, loadingCaps, loadingInfo } = this.state;
+    const loading = loadingAdmin || loadingCluster || loadigDDNSAzure || loadingCaps || loadingInfo;
 
     return (
       <React.Fragment>

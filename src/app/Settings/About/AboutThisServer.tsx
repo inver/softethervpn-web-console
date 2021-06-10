@@ -3,8 +3,7 @@ import { PageSection, Title, Stack, StackItem } from '@patternfly/react-core';
 import { Table, TableHeader, TableBody } from '@patternfly/react-table';
 import { Bullseye, Spinner } from '@patternfly/react-core';
 import { split_string_by_capitalization, mode_to_string } from '@app/utils/string_utils';
-import { api } from '@app/utils/vpnrpc_settings';
-import { capsListGlobal } from '@app/index';
+import { capsListGlobal, infoListGlobal } from '@app/index';
 
 const loading_rows = [
       {
@@ -50,43 +49,39 @@ class AboutThisServerTable extends React.Component {
 
   componentDidMount() {
     let rows = [];
-    api.GetServerInfo().then(response => {
-      Object.keys(response).forEach( key => {
-        let value = response[key];
-        if( key == "ServerType_u32" ){
-          value = mode_to_string(value);
-        }
-        rows.push({cells: [split_string_by_capitalization(key), value], props: { colSpan: 8 }})
-      });
-
-        const tail = []
-
-        capsListGlobal.forEach(cap => {
-          let capval = cap.CapsValue_u32;
-
-          if(capval === 1){
-            capval = "Yes"
-          }
-
-          if(capval === 0){
-            capval = "No"
-          }
-
-          if(cap.CapsDescrption_utf.slice(0,7) === "Maximum"){
-
-            tail.push({cells: [cap.CapsDescrption_utf, capval], props: { colSpan: 8 }});
-          }
-          else{
-            rows.push({cells: [cap.CapsDescrption_utf, capval], props: { colSpan: 8 }});
-          }
-
-
-        });
-        rows = rows.concat(tail);
-        this.setState({ rows: rows });
-    }).catch( error => {
-      console.log(error)
+    Object.keys(infoListGlobal).forEach( key => {
+      let value = infoListGlobal[key];
+      if( key == "ServerType_u32" ){
+        value = mode_to_string(value);
+      }
+      rows.push({cells: [split_string_by_capitalization(key), value], props: { colSpan: 8 }})
     });
+
+    const tail = []
+
+    capsListGlobal.forEach(cap => {
+      let capval = cap.CapsValue_u32;
+
+      if(capval === 1){
+        capval = "Yes"
+      }
+
+      if(capval === 0){
+        capval = "No"
+      }
+
+      if(cap.CapsDescrption_utf.slice(0,7) === "Maximum"){
+
+        tail.push({cells: [cap.CapsDescrption_utf, capval], props: { colSpan: 8 }});
+      }
+      else{
+        rows.push({cells: [cap.CapsDescrption_utf, capval], props: { colSpan: 8 }});
+      }
+
+
+    });
+    rows = rows.concat(tail);
+    this.setState({ rows: rows });
   }
 
 
