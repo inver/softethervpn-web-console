@@ -1,9 +1,13 @@
 html, body, #root {
   height: 100%;
-  
+
 }
 
 .config-textarea-tall{
   --pf-c-form-control--textarea--Height: 100%;
   /*--pf-c-form-control--readonly--BackgroundColor: white;*/
+}
+
+.hub-status-limit-height{
+  height: 420px;
 }

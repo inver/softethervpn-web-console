@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { accessibleRouteChangeHandler } from '@app/utils/utils';
 import { Dashboard } from '@app/Dashboard/Dashboard';
-import { Support } from '@app/Support/Support';
+import { Hubs } from '@app/Hubs/Hubs';
 import { LocalBridge } from '@app/Functionalities/LocalBridge/LocalBridge';
 import { Layer3Switch } from '@app/Functionalities/Layer3Switch/Layer3Switch';
 import { LegacyProtocols } from '@app/Functionalities/LegacyProtocols/LegacyProtocols';
@@ -49,17 +49,16 @@ const routes: AppRouteConfig[] = [
   {
     component: Dashboard,
     exact: true,
-    label: 'Dashboard',
     path: '/',
     title: 'SoftEther VPN Console | Main Dashboard',
   },
   {
-    component: Support,
+    component: Hubs,
     exact: true,
     isAsync: true,
-    label: 'Support',
-    path: '/support',
-    title: 'SoftEther VPN Console | Support Page',
+    label: 'Hubs',
+    path: '/hubs',
+    title: 'SoftEther VPN Console | Hubs',
   },
   {
     label: 'Functionalities',
