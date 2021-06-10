@@ -7,12 +7,14 @@ import {
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
-class DelSwitchModal extends React.Component {
+// props are 'buttonText', 'modalText', 'onConfirm', 'isDisabled', and optionally 'externalToggle' which prevent the button from rendering
+class DeletionModal extends React.Component {
   constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
 
     this.state = {
-      isModalOpen: false
+      isModalOpen: false,
+      isButtonHidden: false
     };
 
     this.handleModalToggle = () => {
@@ -22,32 +24,31 @@ class DelSwitchModal extends React.Component {
     };
 
     this.handleConfirmClick = () => {
-      const param: VPN.VpnRpcL3Sw = new VPN.VpnRpcL3Sw({
-        Name_str: this.props.switch
-      });
-
-      api.DelL3Switch(param)
-      .then( () => {
-        this.props.onConfirm();
-      })
-      .catch( error => {
-        console.log(error)
-      })
+      this.setState({ isModalOpen: false })
+      this.props.onConfirm()
     };
+  }
+
+  componentDidMount(): void {
+    if(this.props.externalToggle == false || this.props.externalToggle == true ){
+      this.setState({ isModalOpen: this.props.externalToggle, isButtonHidden: true })
+    }
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps: Readonly<RouteComponentProps<{ tag: string }>>): void {
+    this.setState({ isModalOpen: nextProps.externalToggle });
   }
 
   render(): React.Component
   {
-    const { isModalOpen } = this.state;
+    const { isModalOpen, isButtonHidden } = this.state;
 
     return(
       <React.Fragment>
-      <Button variant="primary" onClick={this.handleModalToggle}>
-          Delete
-        </Button>
+      {isButtonHidden ? "" : <Button variant="primary" onClick={this.handleModalToggle} isDisabled={this.props.isDisabled}>{this.props.buttonText}</Button>}
         <Modal
           variant={ModalVariant.small}
-          title="Confirm Delition"
+          title="Confirm Deletion"
           isOpen={isModalOpen}
           onClose={this.handleModalToggle}
           actions={[
@@ -59,12 +60,11 @@ class DelSwitchModal extends React.Component {
             </Button>
           ]}
         >
-          This will delete the Virtual Layer 3 Switch &ldquo;{this.props.switch}&rdquo;.<br/>
-          Are you sure?
+          {this.props.modalText}
         </Modal>
       </React.Fragment>
     );
   }
 }
 
-export { DelSwitchModal };
+export { DeletionModal };

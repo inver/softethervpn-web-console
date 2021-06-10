@@ -31,7 +31,7 @@ import {
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 import { NewSwitchModal } from '@app/Functionalities/Layer3Switch/NewSwitchModal';
-import { DelSwitchModal } from '@app/Functionalities/Layer3Switch/DelSwitchModal';
+import { DeletionModal } from '@app/DeletionModal';
 import { NewIfModal } from '@app/Functionalities/Layer3Switch/NewIfModal';
 import { NewRouteModal } from '@app/Functionalities/Layer3Switch/NewRouteModal';
 
@@ -245,6 +245,20 @@ class DefinedVL3SCard extends React.Component {
         }
       });
     };
+
+    this.handleConfirmClick = () => {
+      const param: VPN.VpnRpcL3Sw = new VPN.VpnRpcL3Sw({
+        Name_str: this.state.selectedSwitch.cells[0]
+      });
+
+      api.DelL3Switch(param)
+      .then( () => {
+        this.handleSwitchUpdate();
+      })
+      .catch( error => {
+        console.log(error)
+      })
+    };
   }
 
   onSelectSwitch(event, isSelected, rowId) {
@@ -258,6 +272,7 @@ class DefinedVL3SCard extends React.Component {
       }
       return oneRow;
     });
+    console.log(selected)
     this.setState({
       switchesRows: rows,
       selectedSwitch: selected,
@@ -396,7 +411,7 @@ class DefinedVL3SCard extends React.Component {
     .catch(error => console.log(error));
   }
 
-  handleSwitchUpdate = () => {
+  handleSwitchUpdate(){
     this.loadSwitches()
     this.setState({
       ifList: [emptyIfs],
@@ -457,6 +472,7 @@ class DefinedVL3SCard extends React.Component {
       isAddRouteDisabled = selectedSwitch.cells[1] == "Running";
       isDelIfDisabled = selectedSwitch.cells[1] == "Running" || !isIfSelected;
       isDelRouteDisabled = selectedSwitch.cells[1] == "Running" || !isRouteSelected;
+      const deleteName = selectedSwitch.cells[0];
     }
     else{
       isAddIfDisabled = true;
@@ -464,6 +480,9 @@ class DefinedVL3SCard extends React.Component {
       isDelIfDisabled = true;
       isDelRouteDisabled = true;
     }
+
+    const deleteText = <Text>This will delete the Virtual Layer 3 Switch &ldquo;{deleteName}&rdquo;.<br/>
+    Are you sure?</Text>
 
     return(
       <React.Fragment>
@@ -490,7 +509,7 @@ class DefinedVL3SCard extends React.Component {
       <NewSwitchModal switches={switchesRows.map(row => { return row.cells[0]})} onConfirm={this.handleSwitchUpdate}/>
       <Button isDisabled={isStartDisabled} onClick={this.handleStartClick} >Start</Button>
       <Button isDisabled={isStopDisabled} onClick={this.handleStopClick}>Stop</Button>
-      { isDeleteDisabled ? <Button isDisabled={isDeleteDisabled}>Delete</Button> : <DelSwitchModal switch={selectedSwitch.cells[0]} onConfirm={this.handleSwitchUpdate}/>}
+      <DeletionModal modalText={deleteText} buttonText="Delete" isDisabled={isDeleteDisabled} onConfirm={this.handleConfirmClick}/>
       </ActionGroup>
       </Form>
       </CardFooter>
