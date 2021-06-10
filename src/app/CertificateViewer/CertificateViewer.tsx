@@ -31,6 +31,7 @@ function prettyHex(rawString: string): string
   return string;
 }
 
+// pass a "certBin={certificate_base64: string}" and a "buttonText={string: string}" props and optionally "isDisabled={bool: boolean}"
 class ViewCertModal extends React.Component {
   constructor(props: Readonly<RouteComponentProps<{ tag: string }>>) {
     super(props);
