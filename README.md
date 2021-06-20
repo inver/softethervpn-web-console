@@ -2,6 +2,8 @@
 
 This project aims to develop an HTML5 management UI for SoftEther VPN Server leveraging (by forking) the [Patternfly Seed](https://github.com/patternfly/patternfly-react-seed) and the [SoftEther VPN Server JSON-RPC API Suite](https://github.com/SoftEtherVPN/SoftEtherVPN/tree/master/developer_tools/vpnserver-jsonrpc-clients/).
 
+![Screenshot](/softether-patternfly-ui-screenshot.png)
+
 ## Quick-start
 
 ```bash

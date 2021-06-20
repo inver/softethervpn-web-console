@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, AlertGroup, AlertActionCloseButton, AlertVariant } from '@patternfly/react-core';
 
-class ToastAlertGroup extends React.Component {
+class ToastAlertGroup extends React.Component { // pass a boolean 'add' to the class and remember to make it false to avoid continuing spawining alerts at every click
   constructor(props: Readonly<RouteComponentProps<{ tag: string }>>) {
     super(props);
     this.state = { alerts: [] };

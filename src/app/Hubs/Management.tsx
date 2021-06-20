@@ -31,6 +31,7 @@ import {
 } from '@patternfly/react-icons';
 import { Properties } from '@app/Hubs/Properties';
 import { UsersList } from '@app/Hubs/Users';
+import { SettingsRADIUS } from '@app/Hubs/SettingsRADIUS';
 import { truncate_qm } from '@app/utils/string_utils';
 
 const mapOfSecondary = {
@@ -164,7 +165,7 @@ class Management extends React.Component {
           </Tab>
           <Tab eventKey={8} title={<><TabTitleIcon><ServerGroupIcon/></TabTitleIcon><TabTitleText>RADIUS</TabTitleText></>}>
           <PageSection variant={PageSectionVariants.light}>
-            Test
+            <SettingsRADIUS hub={hub}/>
           </PageSection>
           </Tab>
           <Tab eventKey={9} title={<><TabTitleIcon><InfrastructureIcon/></TabTitleIcon><TabTitleText>Cascade Connections</TabTitleText></>}>
