@@ -47,7 +47,7 @@ npm run storybook
 npm run build:storybook
 ```
 ## Installing the web UI
-It is possible to try this UI by running ``` npm run build ``` and copying the content of the ``` build ``` folder into ``` src/bin/hamcore/wwwroot/admin/manager ```, which has to be created inside a previously cloned SoftEtherVPN source code and by compliling it.
+It is possible to try this UI by running ``` npm run build ``` and copying the content of the ``` dist ``` folder into ``` src/bin/hamcore/wwwroot/admin/manager ```, which has to be created inside a previously cloned SoftEtherVPN source code and by compliling it.
 
 ## Configurations
 * [TypeScript Config](./tsconfig.json)
