@@ -11,46 +11,46 @@ import {
   Switch,
   NumberInput
 } from '@patternfly/react-core';
-import * as VPN from "vpnrpc/dist/vpnrpc";
 
-class UserPolicyModal extends React.Component {
+class PolicyModal extends React.Component {
   constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
     super(props);
+
+    this.state = {
+      isModalOpen: false,
+      subjectObject: this.props.subject
+    };
 
     this.minValue = 0;
 
     this.onMinus = (object, name) => {
-      const user = this.state.userObject;
-      user[name] = user[name] - 1;
+      const subject = this.state.subjectObject;
+      subject[name] = subject[name] - 1;
 
       this.setState({
-        userObject: user
+        subjectObject: subject
       });
     };
 
     this.onChange = (event) => {
       const name = event.target.name;
       const newValue = isNaN(event.target.value) ? 0 : Number(event.target.value);
-      const user = this.state.userObject;
-      user[name] = newValue < this.minValue ? this.minValue : newValue
+      const subject = this.state.subjectObject;
+      subject[name] = newValue < this.minValue ? this.minValue : newValue
       this.setState({
-        userObject: user
+        subjectObject: subject
       });
     };
 
     this.onPlus = (object, name) => {
-      const user = this.state.userObject;
-      user[name] = user[name] + 1;
+      const subject = this.state.subjectObject;
+      subject[name] = subject[name] + 1;
 
       this.setState({
-        userObject: user
+        subjectObject: subject
       });
     };
 
-    this.state = {
-      isModalOpen: false,
-      userObject: new VPN.VpnRpcSetUser()
-    };
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
         isModalOpen: !isModalOpen
@@ -58,7 +58,7 @@ class UserPolicyModal extends React.Component {
     };
 
     this.handleConfirmClick = () => {
-      this.props.onConfirm(this.state.userObject);
+      this.props.onConfirm(this.state.subjectObject);
       this.setState({ isModalOpen: false });
     };
 
@@ -68,34 +68,34 @@ class UserPolicyModal extends React.Component {
 
     this.handlePolicySwitchChange = (checked, event) => {
       const name = event.target.name;
-      const user = this.state.userObject;
+      const subject = this.state.subjectObject;
 
-      user[name] = checked;
+      subject[name] = checked;
 
-      this.setState({ userObject: user })
+      this.setState({ subjectObject: subject })
     };
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: Readonly<RouteComponentProps<{ tag: string }>>): void {
-    this.setState({ userObject: nextProps.user })
+    this.setState({ subjectObject: nextProps.subject })
   }
 
   render(): React.Fragment {
-    const { isModalOpen, userObject } = this.state;
-    const list = Object.keys(userObject).map( (key) => {
+    const { isModalOpen, subjectObject } = this.state;
+    const list = Object.keys(subjectObject).map( (key) => {
 
       if(key.slice(0,7) === "policy:"){
         let content: React.Fragment;
         if(key.slice(-5) === "_bool"){
           content = (
-            <Switch name={key} aria-label="Message when on" isChecked={userObject[key]} onChange={this.handlePolicySwitchChange} />
+            <Switch name={key} aria-label="Message when on" isChecked={subjectObject[key]} onChange={this.handlePolicySwitchChange} />
           )
         }
         else{
           content = (
             <NumberInput
               name={key}
-              value={userObject[key]}
+              value={subjectObject[key]}
               min={this.minValue}
               onMinus={this.onMinus}
               onChange={this.onChange}
@@ -133,7 +133,7 @@ class UserPolicyModal extends React.Component {
         </Button>
         <Modal
           variant={ModalVariant.large}
-          title={"Security Policy of User " + userObject.Name_str}
+          title={"Security Policy of " + subjectObject.Name_str}
           isOpen={isModalOpen}
           onClose={this.handleModalToggle}
           actions={[
@@ -157,4 +157,4 @@ class UserPolicyModal extends React.Component {
   }
 }
 
-export { UserPolicyModal };
+export { PolicyModal };

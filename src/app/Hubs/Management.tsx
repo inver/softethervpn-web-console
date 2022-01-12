@@ -31,6 +31,7 @@ import {
 } from '@patternfly/react-icons';
 import { Properties } from '@app/Hubs/Properties';
 import { UsersList } from '@app/Hubs/Users';
+import { GroupsList } from '@app/Hubs/Groups';
 import { SettingsRADIUS } from '@app/Hubs/SettingsRADIUS';
 import { truncate_qm } from '@app/utils/string_utils';
 
@@ -146,7 +147,7 @@ class Management extends React.Component {
           </Tab>
           <Tab eventKey={5} title={<><TabTitleIcon><UsersIcon /></TabTitleIcon> <TabTitleText>Groups</TabTitleText>  </>}>
           <PageSection variant={PageSectionVariants.light}>
-            Test
+            <GroupsList hub={hub}/>
           </PageSection>
           </Tab>
           <Tab eventKey={6} title={<><TabTitleIcon><CheckCircleIcon/ ></TabTitleIcon><TabTitleText>Access Lists</TabTitleText></>}>

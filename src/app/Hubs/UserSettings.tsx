@@ -28,8 +28,7 @@ import {
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 import { ViewCertModal } from '@app/CertificateViewer/CertificateViewer';
-import { UserPolicyModal } from '@app/Hubs/UserSecurityPolicy';
-import { ToastAlertGroup } from '@app/Hubs/Notifications';
+import { PolicyModal } from '@app/Hubs/SecurityPolicy';
 
 function base64ToHex(str: string): string
 {
@@ -98,10 +97,6 @@ class UserSettings extends React.Component {
       limitSN: false,
       specifyUser: false,
       specifyUserValue: "",
-      showAlert: false,
-      alertTitle: "",
-      alertVariant: 'info',
-      alertBody: "",
       serialNumber: ""
     };
 
@@ -263,11 +258,22 @@ class UserSettings extends React.Component {
       user.Serial_bin = bytes;
       this.setState({ userObject: user, serialNumber: uppValue })
     };
+
+    this.onAlert = this.onAlert.bind(this);
+  }
+
+  onAlert(alertObject: object): void {
+    this.props.onAlert(alertObject);
   }
 
   saveUser(): void {
     const param = this.state.userObject;
     param.UserX_bin = new TextEncoder().encode(param.UserX_bin);
+    const alertObject = {
+      title: "",
+      variant: 'info',
+      body: ""
+    }
     delete param["CreatedTime_dt"];
     delete param["UpdatedTime_dt"];
     delete param["HashedKey_bin"];
@@ -276,47 +282,33 @@ class UserSettings extends React.Component {
     if(this.props.create){
       api.CreateUser(param)
       .then( () => {
-        this.setState({
-          showAlert: true,
-          alertTitle: "A new user has been created",
-          alertVariant: 'info',
-          alertBody: ""
-        })
-        this.setState({ showAlert: false })
-        this.props.hideOnConfirmation()
-        this.props.updateUser()
+        alertObject.title = "A new user has been created";
+        alertObject.variant = 'info';
+        alertObject.body = "";
+        this.props.onAlert(alertObject);
+        this.props.updateUser();
       })
       .catch( error => {
-        this.setState({
-          showAlert: true,
-          alertTitle: "An error has occurred",
-          alertVariant: 'danger',
-          alertBody: error.toString()
-        })
-        this.setState({ showAlert: false })
+        alertObject.title = "An error has occurred";
+        alertObject.variant = 'danger';
+        alertObject.body = error.toString();
+        this.props.onAlert(alertObject);
       });
     }
     else{
       api.SetUser(param)
       .then( () => {
-        this.setState({
-          showAlert: true,
-          alertTitle: "User Settings correctly updated",
-          alertVariant: 'info',
-          alertBody: ""
-        })
-        this.setState({ showAlert: false })
-        this.props.hideOnConfirmation()
-        this.props.updateUser()
+        alertObject.title = "User Settings correctly updated";
+        alertObject.variant = 'info';
+        alertObject.body = "";
+        this.props.onAlert(alertObject);
+        this.props.updateUser();
       })
       .catch( error => {
-        this.setState({
-          showAlert: true,
-          alertTitle: "An error has occurred",
-          alertVariant: 'danger',
-          alertBody: error.toString()
-        })
-        this.setState({ showAlert: false })
+        alertObject.title = "An error has occurred";
+        alertObject.variant = 'danger';
+        alertObject.body = error.toString();
+        this.props.onAlert(alertObject);
       });
     }
   }
@@ -378,10 +370,6 @@ class UserSettings extends React.Component {
       limitSN,
       specifyUser,
       specifyUserValue,
-      showAlert,
-      alertTitle,
-      alertVariant,
-      alertBody,
       serialNumber
     } = this.state;
     const date = new Date(userObject.ExpireTime_dt);
@@ -414,17 +402,13 @@ class UserSettings extends React.Component {
       <CardBody>
       <Stack hasGutter>
       <StackItem>
-      <Flex id="edit" justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+      <Flex id="editUser" justifyContent={{ default: 'justifyContentSpaceBetween' }}>
 
       <FlexItem>
       <Form isHorizontal>
       <FormSection>
       <FormGroup label="User Name">
-      { !create ?
-        <Text><b>{userObject.Name_str}</b></Text>
-      :
-        <TextInput name="Name_str" value={userObject.Name_str} type="text" onChange={this.handleTextInputChange} aria-label="user name input" />
-      }
+      <TextInput name="Name_str" value={userObject.Name_str} type="text" onChange={this.handleTextInputChange} aria-label="user name input" isDisabled={!create}/>
       </FormGroup>
       <FormGroup label="Full Name">
         <TextInput name="Realname_utf" value={userObject.Realname_utf} type="text" onChange={this.handleTextInputChange} aria-label="full name input" />
@@ -482,7 +466,7 @@ class UserSettings extends React.Component {
         />
         </StackItem>
         <StackItem>
-        <UserPolicyModal isDisabled={!userObject.UsePolicy_bool} onConfirm={this.handlePolicyChange} user={userObject} />
+        <PolicyModal isDisabled={!userObject.UsePolicy_bool} onConfirm={this.handlePolicyChange} subject={userObject} subjectType={0} />
         </StackItem>
       </Stack>
       </FlexItem>
@@ -612,7 +596,6 @@ class UserSettings extends React.Component {
       <Button isDisabled={saveDisabled} onClick={this.handleEditSaveClick}>Save</Button>
       </CardFooter>
       </Card>
-      <ToastAlertGroup title={alertTitle} variant={alertVariant} child={alertBody} add={showAlert} />
       </React.Fragment>
     );
   }

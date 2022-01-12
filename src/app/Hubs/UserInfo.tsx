@@ -13,7 +13,7 @@ import {
 
 const UserInfoTable: React.FunctionComponent = (props) => (
   <React.Fragment>
-  <Card id="info">
+  <Card id="infoUser">
   <CardHeader>
     <Button variant="secondary" onClick={() => props.refresh()}>Refresh</Button>
   </CardHeader>

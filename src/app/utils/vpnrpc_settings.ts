@@ -16,7 +16,7 @@ if (process.env.NODE_ENV !== 'development') {
   api = new VPN.VpnServerRpc();
 } else {
   // On the Node.js. We need to specify the target VPN Server's hostname, port and credentials.
-  api = new VPN.VpnServerRpc('127.0.0.1', 443, user, password, false);
+  api = new VPN.VpnServerRpc('127.0.0.1', 5555, user, password, false);
 }
 
 /** API test for 'Test', test RPC function */

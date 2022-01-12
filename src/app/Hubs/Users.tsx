@@ -21,14 +21,20 @@ import {
   StackItem
 } from '@patternfly/react-core';
 import {
-  Table,
-  TableHeader,
-  TableBody,
-  RowSelectVariant
+  TableComposable,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td
 } from '@patternfly/react-table';
-import { UserSettings } from '@app/Hubs/UserProperties';
+import {
+  BanIcon
+} from '@patternfly/react-icons';
+import { UserSettings } from '@app/Hubs/UserSettings';
 import { UserInfoTable } from '@app/Hubs/UserInfo';
 import { DeletionModal } from '@app/DeletionModal';
+import { ToastAlertGroup } from '@app/Hubs/Notifications';
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
@@ -43,27 +49,36 @@ function numToAuthType(num: number): string
   "")
 }
 
-const emptyTable = {
-      heightAuto: true,
-      cells: [
-        {
-          props: { colSpan: 8 },
-          title: (
-            <Bullseye>
-              <EmptyState variant={EmptyStateVariant.small}>
-                <Title headingLevel="h2" size="lg">
-                  No users found
-                </Title>
-                <EmptyStateBody>
-                  There is not yet any user in this hub. Define users to allow client connections.
-                </EmptyStateBody>
-              </EmptyState>
-            </Bullseye>
-          )
-        }
-      ],
-      disableSelection: true
-    }
+
+const emptyTable = (
+            <Tr>
+              <Td colSpan={12}>
+                <Bullseye>
+                  <EmptyState variant={EmptyStateVariant.small}>
+                    <Title headingLevel="h2" size="lg">
+                      No users found
+                    </Title>
+                    <EmptyStateBody>
+                      There is not yet any user in this hub. Define users to allow client connections.
+                    </EmptyStateBody>
+                  </EmptyState>
+                </Bullseye>
+                </Td>
+            </Tr>
+);
+
+const columnNames = {
+  name: "User Name",
+  full: "Full Name",
+  group: "Group Name",
+  desc: "Description",
+  auth: "Auth Method",
+  num: "Logins number",
+  last: "Last Login",
+  exp: "Expiration Date",
+  bytes: "Transfer Bytes",
+  packets: "Transfer Packets"
+}
 
 class UsersList extends React.Component {
   constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
@@ -71,16 +86,20 @@ class UsersList extends React.Component {
 
     this.state = {
       hub: this.props.hub,
-      columns: ['User Name', 'Full Name', 'Group Name', 'Description', 'Auth Method', 'Num Logins', 'Last Login', 'Expiration Date', 'Transfer Bytes', 'Transfer Packets'],
-      rows: [emptyTable],
+      rows: [],
+      selectedRow: "",
+      isEmpty: true,
       isMenuOpen: false,
       isSelected: false,
       showEdit: false,
       showInfo: false,
       userObject: new VPN.VpnRpcSetUser(),
-      showCreate: false
+      showCreate: false,
+      showAlert: false,
+      alertTitle: "",
+      alertVariant: 'info',
+      alertBody: ""
     };
-    this.onUserSelect = this.onUserSelect.bind(this);
 
     this.onMenuToggle = isMenuOpen => {
       this.setState({
@@ -94,32 +113,32 @@ class UsersList extends React.Component {
     };
 
     this.toggleEdit = () => {
-      this.setState({ showEdit: !this.state.showEdit, showInfo: false });
+      this.setState({ showEdit: !this.state.showEdit, showInfo: false, showCreate: false });
       if(!this.state.showEdit){
         setTimeout(() => {
-          const element = document.getElementById("edit");
+          const element = document.getElementById("editUser");
           element.scrollIntoView();
         }, 1);
       }
     };
 
     this.toggleInfo = () => {
-      this.setState({ showInfo: !this.state.showInfo, showEdit: false });
+      this.setState({ showInfo: !this.state.showInfo, showEdit: false, showCreate: false });
       if(!this.state.showInfo){
         setTimeout(() => {
-          const element = document.getElementById("info");
+          const element = document.getElementById("infoUser");
           element.scrollIntoView();
         }, 1);
       }
     };
 
     this.hideEdit = () => {
-      this.setState({ showEdit: false })
+      this.setState({ showEdit: false, showCreate: false })
     };
 
     this.updateUsers = () => {
       this.loadUsers()
-      this.setState({ showEdit: false, showInfo: false })
+      this.setState({ showEdit: false, showInfo: false, showCreate: false })
     };
 
     this.updateCurrentUser = () => {
@@ -128,11 +147,17 @@ class UsersList extends React.Component {
 
     this.toggleCreate = () => {
       if(!this.state.showCreate){
+        const rows = this.state.rows.map((oneRow) => {
+          if(oneRow.selected){
+            oneRow.selected = !oneRow.selected
+          }
+          return oneRow;
+        });
         setTimeout(() => {
-          const element = document.getElementById("edit");
+          const element = document.getElementById("editUser");
           element.scrollIntoView();
         }, 1);
-        this.setState({ userObject: new VPN.VpnRpcSetUser(), isSelected: false, showEdit: false, showInfo: false })
+        this.setState({ rows: rows, userObject: new VPN.VpnRpcSetUser(), isSelected: false, showEdit: false, showInfo: false })
       }
       this.setState({ showCreate: !this.state.showCreate })
     };
@@ -151,20 +176,23 @@ class UsersList extends React.Component {
         alert(error)
       });
     };
+
+    this.onAlert = this.onAlert.bind(this);
   }
 
-  onUserSelect(event: Record<string, unknown>, isSelected: boolean, rowId: number): void {
-    const rows = this.state.rows.map((oneRow, index) => {
-      oneRow.selected = rowId === index;
-      if(oneRow.selected){
-        this.loadUser(oneRow.cells[0])
-      }
-      return oneRow;
-    });
+  onAlert(alert: object): void {
     this.setState({
-        rows: rows,
-        isSelected: true
+      showAlert: true,
+      alertTitle: alert.title,
+      alertVariant: alert.variant,
+      alertBody: alert.body
     });
+    this.setState({ showAlert: false });
+  }
+
+  setSelectedRow(rowName: string): void {
+    this.loadUser(rowName);
+    this.setState({ selectedRow: rowName, isSelected: true });
   }
 
   loadUsers(): void {
@@ -193,26 +221,20 @@ class UsersList extends React.Component {
         }
 
         return ({
-          cells: [
-            user.Name_str,
-            user.Realname_utf,
-            user.GroupName_str,
-            user.Note_utf,
-            numToAuthType(user.AuthType_u32),
-            user.NumLogin_u32,
-            lastLogin,
-            expiration,
-            user["Ex.Recv.BroadcastBytes_u64"] + user["Ex.Recv.UnicastBytes_u64"] + user["Ex.Send.BroadcastBytes_u64"] + user["Ex.Send.UnicastBytes_u64"],
-            user["Ex.Recv.BroadcastCount_u64"] + user["Ex.Recv.UnicastCount_u64"] + user["Ex.Send.BroadcastCount_u64"] + user["Ex.Send.UnicastCount_u64"]
-          ]
-        })
+          name: user.Name_str,
+          full: user.Realname_utf,
+          group: user.GroupName_str,
+          desc: user.Note_utf,
+          auth: numToAuthType(user.AuthType_u32),
+          num: user.NumLogin_u32,
+          last: lastLogin,
+          exp: expiration,
+          bytes: user["Ex.Recv.BroadcastBytes_u64"] + user["Ex.Recv.UnicastBytes_u64"] + user["Ex.Send.BroadcastBytes_u64"] + user["Ex.Send.UnicastBytes_u64"],
+          packets: user["Ex.Recv.BroadcastCount_u64"] + user["Ex.Recv.UnicastCount_u64"] + user["Ex.Send.BroadcastCount_u64"] + user["Ex.Send.UnicastCount_u64"],
+          deny: user.DenyAccess_bool
+          })
     });
-      if(response.UserList.length == 0){
-        this.setState({ rows: [emptyTable]})
-      }
-      else{
-        this.setState({ rows: rows })
-      }
+    this.setState({ isEmpty: response.UserList.length == 0, rows: rows })
     })
     .catch(error => {
       alert(error)
@@ -239,14 +261,19 @@ class UsersList extends React.Component {
   render(): React.Component {
      const {
        hub,
-       columns,
        rows,
+       selectedRow,
+       isEmpty,
        isMenuOpen,
        isSelected,
        showEdit,
        showInfo,
        userObject,
-       showCreate
+       showCreate,
+       showAlert,
+       alertTitle,
+       alertVariant,
+       alertBody
      } = this.state;
      const dropdownItems = [
       <OverflowMenuDropdownItem key="refresh" isShared onClick={this.updateUsers}>Refresh</OverflowMenuDropdownItem>
@@ -255,7 +282,7 @@ class UsersList extends React.Component {
 
     if(isSelected){
       dropdownItems.push(<OverflowMenuDropdownItem key="edit" isShared onClick={this.toggleEdit}>{ showEdit ? "Hide Edit" : "Show Edit" }</OverflowMenuDropdownItem>);
-      dropdownItems.push(<OverflowMenuDropdownItem key="view" isShared onClick={this.toggleInfo}>{ showInfo ? "Hide User Info" : "Show User Info" }</OverflowMenuDropdownItem>)
+      dropdownItems.push(<OverflowMenuDropdownItem key="info" isShared onClick={this.toggleInfo}>{ showInfo ? "Hide User Info" : "Show User Info" }</OverflowMenuDropdownItem>)
     }
 
     const modalText = "Are you sure you want to delete the user '" + userObject.Name_str + "'?";
@@ -288,24 +315,60 @@ class UsersList extends React.Component {
       </OverflowMenu>
       </CardHeader>
       <CardBody>
-      <Table
-        variant="compact"
-        onSelect={rows[0].disableSelection == true ? "" : this.onUserSelect}
-        selectVariant={RowSelectVariant.radio}
-        aria-label="Users Table"
-        cells={columns}
-        rows={rows}
-      >
-        <TableHeader />
-        <TableBody />
-      </Table>
+      <TableComposable variant='compact'>
+      <Thead>
+        <Tr>
+          <Th />
+          <Th>{columnNames.name}</Th>
+          <Th>{columnNames.full}</Th>
+          <Th>{columnNames.group}</Th>
+          <Th>{columnNames.desc}</Th>
+          <Th>{columnNames.auth}</Th>
+          <Th>{columnNames.num}</Th>
+          <Th>{columnNames.last}</Th>
+          <Th>{columnNames.exp}</Th>
+          <Th>{columnNames.bytes}</Th>
+          <Th>{columnNames.packets}</Th>
+        </Tr>
+      </Thead>
+      <Tbody>
+      {
+        isEmpty ? emptyTable :
+        rows.map( (row, rowIndex) => {
+          return(
+            <Tr key={row.name}>
+              <Td
+                select={{
+                  rowIndex,
+                  onSelect: () => this.setSelectedRow(row.name),
+                  isSelected: selectedRow === row.name,
+                  disable: false,
+                  variant: 'radio'
+                }}
+              />
+              <Td dataLabel={columnNames.name}>{row.name} {row.deny ? <BanIcon /> : ""}</Td>
+              <Td dataLabel={columnNames.full}>{row.full}</Td>
+              <Td dataLabel={columnNames.group}>{row.group}</Td>
+              <Td dataLabel={columnNames.desc}>{row.desc}</Td>
+              <Td dataLabel={columnNames.auth}>{row.auth}</Td>
+              <Td dataLabel={columnNames.num}>{row.num}</Td>
+              <Td dataLabel={columnNames.last}>{row.last}</Td>
+              <Td dataLabel={columnNames.exp}>{row.exp}</Td>
+              <Td dataLabel={columnNames.bytes}>{row.bytes}</Td>
+              <Td dataLabel={columnNames.packets}>{row.packets}</Td>
+            </Tr>
+          )
+        })
+      }
+      </Tbody>
+      </TableComposable>
       </CardBody>
       </Card>
       </StackItem>
       {
         showEdit ?
         <StackItem>
-          <UserSettings create={false} user={userObject} hideOnConfirmation={this.hideEdit} updateUser={this.updateUsers}/>
+          <UserSettings create={false} hub={hub} user={userObject} updateUser={this.updateUsers}  onAlert={this.onAlert}/>
         </StackItem>
         :
         ""
@@ -323,7 +386,7 @@ class UsersList extends React.Component {
       {
         showCreate ?
         <StackItem>
-          <UserSettings create={true} hub={hub} hideOnConfirmation={this.toggleCreate} updateUser={this.updateUsers}/>
+          <UserSettings create={true} hub={hub} updateUser={this.updateUsers} onAlert={this.onAlert}/>
         </StackItem>
         :
         ""
@@ -331,6 +394,7 @@ class UsersList extends React.Component {
 
 
       </Stack>
+      <ToastAlertGroup title={alertTitle} variant={alertVariant} child={alertBody} add={showAlert} />
       </React.Fragment>
     );
   }
