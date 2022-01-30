@@ -197,7 +197,7 @@ cp -r dist/* SoftEtherVPN-%{V5_VERSION}/%{console_path}
 
 pushd SoftEtherVPN-%{V5_VERSION}
 git submodule init && git submodule update
-CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=junk/ -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
+CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=%{_builddir} -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
 make -C build
 # Now build v4 if possible
 %ifnarch %{nv4_arches}
@@ -262,9 +262,6 @@ mv %{buildroot}/list_cpu_features %{buildroot}/%{_bindir}/list_cpu_features
 mkdir -p %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 wget https://github.com/Leuca/softether-patternfly-ui/archive/refs/heads/master.zip
 mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
-
-# remove junk
-rm -rf %{buildroot}/junk
 
 
 %files
