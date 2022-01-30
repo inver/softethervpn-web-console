@@ -204,7 +204,7 @@ make -C build
 pushd ..
 mkdir SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 cp -r dist/* SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
-pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
+pushd SoftEtherVPN_Stable-%{V4_VERSION}
 ./configure
 make
 %endif
