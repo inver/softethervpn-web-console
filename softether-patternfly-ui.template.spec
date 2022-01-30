@@ -73,7 +73,7 @@ URL:        https://github.com/Leuca/softether-patternfly-ui
 # for the created rpm package
 VCS:        {{{ git_dir_vcs }}}
 
-BuildRequires:	npm wget unzip cmake ncurses-devel openssl-devel libsodium-devel readline-devel zlib-devel
+BuildRequires:	npm wget cmake ncurses-devel openssl-devel libsodium-devel readline-devel zlib-devel
 BuildRequires:  gettext diffstat doxygen git patch patchutils subversion systemtap
 BuildRequires:  nodejs
 
@@ -191,7 +191,7 @@ mkdir SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 cp -r dist/* SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 pushd SoftEtherVPN-%{V5_VERSION}
 git submodule init && git submodule update
-CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=%{buildroot}/tmp/ -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
+CMAKE_FLAGS="-DSKIP_CPU_FEATURES -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=junk/ -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
 make -C build
 # Now build v4
 pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
@@ -208,12 +208,11 @@ mkdir -p %{buildroot}/%{_sysconfdir}/softether5
 pushd SoftEtherVPN-%{V5_VERSION}
 make DESTDIR=%{buildroot} -C build install
 rm -rf %{buildroot}/%{_bindir}
-rm -rf %{buildroot}/tmp
 mv %{buildroot}/%{_libexecdir}/softether %{buildroot}/%{_libexecdir}/softether5
 pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
 mkdir -p %{buildroot}/%{_bindir}
 INSTALL_BINDIR=%{buildroot}/%{_bindir}/ INSTALL_VPNSERVER_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnserver/ INSTALL_VPNBRIDGE_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnbridge/ INSTALL_VPNCLIENT_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnclient/ INSTALL_VPNCMD_DIR=%{buildroot}/%{_libexecdir}/softether4/vpncmd/ make -e install
-rm -r %{buildroot}/%{_bindir}
+rm -rf %{buildroot}/%{_bindir}
 # Create systemd units
 %unit_gen "5" "server"
 %unit_gen "5" "bridge"
@@ -234,59 +233,67 @@ chmod 755 %{buildroot}/%{_bindir}/vpncmd4
 # Install sources
 mkdir -p %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 wget https://github.com/Leuca/softether-patternfly-ui/archive/refs/heads/master.zip
-unzip master.zip
-mv softether-patternfly-ui-master/* %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
+mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 
 
 %files
 %license LICENSE
-%{_usrsrc}/SoftEtherVPN-patternfly-sources/*
+%{_usrsrc}/SoftEtherVPN-patternfly-sources/master.zip
 
 %files -n SoftEtherVPN5-common
 %license SoftEtherVPN-%{V5_VERSION}/LICENSE
 %{_sysconfdir}/softether5
 %{_libexecdir}/softether5
-%{_libexecdir}/softether5/vpncmd/*
+%{_libexecdir}/softether5/vpncmd/vpncmd
+%{_libexecdir}/softether5/vpncmd/hamcore.se2
 %{_bindir}/vpncmd5
 %{_rundir}/softether5
 %{_localstatedir}/log/softether5
-%{_libdir}/*
-%{_includedir}/*
+%{_libdir}/libcedar.so
+%{_libdir}/libmayaqua.so
+
 
 %files -n SoftEtherVPN5-server
 %license SoftEtherVPN-%{V5_VERSION}/LICENSE
-%{_libexecdir}/softether5/vpnserver/*
+%{_libexecdir}/softether5/vpnserver/vpnserver
+%{_libexecdir}/softether5/vpnserver/hamcore.se2
 %{systemd_unit_path}/softether5-server.service
 
 %files -n SoftEtherVPN5-bridge
 %license SoftEtherVPN-%{V5_VERSION}/LICENSE
-%{_libexecdir}/softether5/vpnbridge/*
+%{_libexecdir}/softether5/vpnbridge/vpnbridge
+%{_libexecdir}/softether5/vpnbridge/hamcore.se2
 %{systemd_unit_path}/softether5-bridge.service
 
 %files -n SoftEtherVPN5-client
 %license SoftEtherVPN-%{V5_VERSION}/LICENSE
-%{_libexecdir}/softether5/vpnclient/*
+%{_libexecdir}/softether5/vpnclient/vpnclient
+%{_libexecdir}/softether5/vpnclient/hamcore.se2
 %{systemd_unit_path}/softether5-client.service
 
 %files -n SoftEtherVPN4-common
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
 %{_libexecdir}/softether4
-%{_libexecdir}/softether4/vpncmd/*
+%{_libexecdir}/softether4/vpncmd/vpncmd
+%{_libexecdir}/softether4/vpncmd/hamcore.se2
 %{_bindir}/vpncmd4
 
 %files -n SoftEtherVPN4-server
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
-%{_libexecdir}/softether4/vpnserver/*
+%{_libexecdir}/softether4/vpnserver/vpnserver
+%{_libexecdir}/softether4/vpnserver/hamcore.se2
 %{systemd_unit_path}/softether4-server.service
 
 %files -n SoftEtherVPN4-bridge
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
-%{_libexecdir}/softether4/vpnbridge/*
+%{_libexecdir}/softether4/vpnbridge/vpnbridge
+%{_libexecdir}/softether4/vpnbridge/hamcore.se2
 %{systemd_unit_path}/softether4-bridge.service
 
 %files -n SoftEtherVPN4-client
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
-%{_libexecdir}/softether4/vpnclient/*
+%{_libexecdir}/softether4/vpnclient/vpnclient
+%{_libexecdir}/softether4/vpnclient/hamcore.se2
 %{systemd_unit_path}/softether4-client.service
 
 %changelog
