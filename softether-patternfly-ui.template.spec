@@ -75,7 +75,7 @@ VCS:        {{{ git_dir_vcs }}}
 
 BuildRequires:	npm wget unzip cmake ncurses-devel openssl-devel libsodium-devel readline-devel zlib-devel
 BuildRequires:  gettext diffstat doxygen git patch patchutils subversion systemtap
-BuildRequires:  nodejs <= 16
+BuildRequires:  nodejs
 
 Source:     {{{ git_dir_pack }}}
 
