@@ -263,6 +263,9 @@ mkdir -p %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 wget https://github.com/Leuca/softether-patternfly-ui/archive/refs/heads/master.zip
 mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 
+# remove junk
+rm -rf %{buildroot}/junk
+
 
 %files
 %license LICENSE
