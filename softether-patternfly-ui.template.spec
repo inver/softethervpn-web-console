@@ -201,6 +201,7 @@ CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=j
 make -C build
 # Now build v4 if possible
 %ifnarch %{nv4_arches}
+pushd ..
 mkdir SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 cp -r dist/* SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
