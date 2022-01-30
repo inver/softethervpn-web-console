@@ -197,7 +197,7 @@ cp -r dist/* SoftEtherVPN-%{V5_VERSION}/%{console_path}
 
 pushd SoftEtherVPN-%{V5_VERSION}
 git submodule init && git submodule update
-CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=%{_builddir} -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
+CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=%{systemd_unit_path} -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
 make -C build
 # Now build v4 if possible
 %ifnarch %{nv4_arches}
@@ -221,6 +221,10 @@ mkdir -p %{buildroot}/%{_sysconfdir}/softether5
 # Install v5 and generate units
 pushd SoftEtherVPN-%{V5_VERSION}
 make DESTDIR=%{buildroot} -C build install
+# rename systemd units
+mv %{buildroot}/%{systemd_unit_path}/softether-vpnbridge.service %{buildroot}/%{systemd_unit_path}/softether5-bridge.service
+mv %{buildroot}/%{systemd_unit_path}/softether-vpnserver.service %{buildroot}/%{systemd_unit_path}/softether5-server.service
+mv %{buildroot}/%{systemd_unit_path}/softether-vpnclient.service %{buildroot}/%{systemd_unit_path}/softether5-client.service
 # backup the only binary we want before losing it if needed
 %ifnarch %{ncpu_features}
 cp %{buildroot}/%{_bindir}/list_cpu_features %{buildroot}/list_cpu_features
