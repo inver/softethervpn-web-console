@@ -73,9 +73,9 @@ URL:        https://github.com/Leuca/softether-patternfly-ui
 # for the created rpm package
 VCS:        {{{ git_dir_vcs }}}
 
-BuildRequires:	nodejs npm wget unzip cmake ncurses-devel openssl-devel libsodium-devel readline-devel zlib-devel
+BuildRequires:	npm wget unzip cmake ncurses-devel openssl-devel libsodium-devel readline-devel zlib-devel
 BuildRequires:  gettext diffstat doxygen git patch patchutils subversion systemtap
-
+BuildRequires:  nodejs <= 16
 
 Source:     {{{ git_dir_pack }}}
 
