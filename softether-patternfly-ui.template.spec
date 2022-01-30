@@ -5,6 +5,8 @@
 %define V4_VERSION 4.38-9760-rtm
 %define console_path src/bin/hamcore/wwwroot/admin/manager
 %define systemd_unit_path %{_prefix}/lib/systemd/system
+%define ncpu_features aarch64 %{arm} s390x 
+%define nv4_arches  s390x ppc64le 
 
 %define unit_gen()\
 if [ %1 == "5" ]; then\
@@ -102,6 +104,7 @@ License:        Apache License Version 2.0
 Requires:       SoftEtherVPN5-common
 URL:    https://github.com/SoftEtherVPN/SoftEtherVPN
 
+%ifnarch %{nv4_arches}
 %package -n SoftEtherVPN4-common
 Summary:        SoftEtherVPN version 4 common files
 License:        Apache License Version 2.0
@@ -124,7 +127,7 @@ Summary:        SoftEtherVPN version 4 bridge
 License:        Apache License Version 2.0
 Requires:       SoftEtherVPN4-common
 URL:    https://github.com/SoftEtherVPN/SoftEtherVPN_Stable
-
+%endif
 
 ## Descriptions
 %description
@@ -135,40 +138,42 @@ SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
 world's most powerful and easy-to-use multi-protocol VPN software.
 This package contains version 5 common files and provides the vpncmd command.
 
-%description -n SoftEtherVPN4-common
-SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
-world's most powerful and easy-to-use multi-protocol VPN software.
-This package contains version 4 common files and provides the vpncmd command.
-
 %description -n SoftEtherVPN5-server
 SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
 world's most powerful and easy-to-use multi-protocol VPN software.
 This package contains version 5 server files and binary.
-
-%description -n SoftEtherVPN4-server
-SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
-world's most powerful and easy-to-use multi-protocol VPN software.
-This package contains version 4 server files and provides the vpncmd command.
 
 %description -n SoftEtherVPN5-bridge
 SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
 world's most powerful and easy-to-use multi-protocol VPN software.
 This package contains version 5 bridge files and binary.
 
-%description -n SoftEtherVPN4-bridge
-SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
-world's most powerful and easy-to-use multi-protocol VPN software.
-This package contains version 4 bridge files and provides the vpncmd command.
-
 %description -n SoftEtherVPN5-client
 SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
 world's most powerful and easy-to-use multi-protocol VPN software.
 This package contains version 5 client files and binary.
 
+%ifnarch %{nv4_arches}
+%description -n SoftEtherVPN4-common
+SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
+world's most powerful and easy-to-use multi-protocol VPN software.
+This package contains version 4 common files and provides the vpncmd command.
+
+%description -n SoftEtherVPN4-server
+SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
+world's most powerful and easy-to-use multi-protocol VPN software.
+This package contains version 4 server files and binary.
+
+%description -n SoftEtherVPN4-bridge
+SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
+world's most powerful and easy-to-use multi-protocol VPN software.
+This package contains version 4 bridge files and binary.
+
 %description -n SoftEtherVPN4-client
 SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
 world's most powerful and easy-to-use multi-protocol VPN software.
-This package contains version 4 client files and provides the vpncmd command.
+This package contains version 4 client files and binary.
+%endif
 
 %prep
 {{{ git_dir_setup_macro }}}
@@ -176,9 +181,11 @@ git clone -b %{V5_VERSION} https://github.com/SoftEtherVPN/SoftEtherVPN.git
 mv SoftEtherVPN SoftEtherVPN-%{V5_VERSION}
 pushd SoftEtherVPN-%{V5_VERSION}
 git submodule init && git submodule update
+%ifnarch %{nv4_arches}
 pushd ..
 wget https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/archive/refs/tags/v%{V4_VERSION}.tar.gz
 tar -xvf v%{V4_VERSION}.tar.gz
+%endif
 
 %build
 # Build console
@@ -187,49 +194,60 @@ npm run build
 # Put the console in the source tree
 mkdir SoftEtherVPN-%{V5_VERSION}/%{console_path}
 cp -r dist/* SoftEtherVPN-%{V5_VERSION}/%{console_path}
-mkdir SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
-cp -r dist/* SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
+
 pushd SoftEtherVPN-%{V5_VERSION}
 git submodule init && git submodule update
-CMAKE_FLAGS="-DSKIP_CPU_FEATURES -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=junk/ -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
+CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=junk/ -DSE_PIDDIR=%{_rundir}/softether5 -DSE_LOGDIR=%{_localstatedir}/log/softether5 -DSE_DBDIR=%{_sysconfdir}/softether5" ./configure
 make -C build
-# Now build v4
+# Now build v4 if possible
+%ifnarch %{nv4_arches}
+mkdir SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
+cp -r dist/* SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
 ./configure
 make
+%endif
 
 %install
+# V5
+# directories
 mkdir -p %{buildroot}/%{_bindir}
 mkdir -p %{buildroot}/%{_rundir}/softether5
 mkdir -p %{buildroot}/%{_localstatedir}/log/softether5
 mkdir -p %{buildroot}/%{_sharedstatedir}/softether5
 mkdir -p %{buildroot}/%{systemd_unit_path}
 mkdir -p %{buildroot}/%{_sysconfdir}/softether5
+# Install v5 and generate units
 pushd SoftEtherVPN-%{V5_VERSION}
 make DESTDIR=%{buildroot} -C build install
 rm -rf %{buildroot}/%{_bindir}
 mv %{buildroot}/%{_libexecdir}/softether %{buildroot}/%{_libexecdir}/softether5
-pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
-mkdir -p %{buildroot}/%{_bindir}
-INSTALL_BINDIR=%{buildroot}/%{_bindir}/ INSTALL_VPNSERVER_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnserver/ INSTALL_VPNBRIDGE_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnbridge/ INSTALL_VPNCLIENT_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnclient/ INSTALL_VPNCMD_DIR=%{buildroot}/%{_libexecdir}/softether4/vpncmd/ make -e install
-rm -rf %{buildroot}/%{_bindir}
 # Create systemd units
 %unit_gen "5" "server"
 %unit_gen "5" "bridge"
 %unit_gen "5" "client"
-%unit_gen "4" "server"
-%unit_gen "4" "bridge"
-%unit_gen "4" "client"
-# Create scripts for vpncmd
 mkdir -p %{buildroot}/%{_bindir}
 echo "#!/bin/sh
 %{_libexecdir}/softether5/vpncmd/vpncmd \"\$@\"
 exit $?" > %{buildroot}/%{_bindir}/vpncmd5
 chmod 755 %{buildroot}/%{_bindir}/vpncmd5
+
+# V4 if possible
+%ifnarch %{nv4_arches}
+pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
+mkdir -p %{buildroot}/%{_bindir}
+INSTALL_BINDIR=%{buildroot}/%{_bindir}/ INSTALL_VPNSERVER_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnserver/ INSTALL_VPNBRIDGE_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnbridge/ INSTALL_VPNCLIENT_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnclient/ INSTALL_VPNCMD_DIR=%{buildroot}/%{_libexecdir}/softether4/vpncmd/ make -e install
+rm -rf %{buildroot}/%{_bindir}
+# Create systemd units
+%unit_gen "4" "server"
+%unit_gen "4" "bridge"
+%unit_gen "4" "client"
 echo "#!/bin/sh
 %{_libexecdir}/softether4/vpncmd/vpncmd \"\$@\"
 exit $?" > %{buildroot}/%{_bindir}/vpncmd4
 chmod 755 %{buildroot}/%{_bindir}/vpncmd4
+%endif
+
 # Install sources
 mkdir -p %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 wget https://github.com/Leuca/softether-patternfly-ui/archive/refs/heads/master.zip
@@ -251,7 +269,20 @@ mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 %{_localstatedir}/log/softether5
 %{_libdir}/libcedar.so
 %{_libdir}/libmayaqua.so
-
+%ifnarch %{ncpu_features}
+%{_libdir}/libcpu_features.a
+%{_includedir}/cpu_features/cpuinfo_aarch64.h
+%{_includedir}/cpu_features/cpuinfo_arm.h
+%{_includedir}/cpu_features/cpuinfo_mips.h
+%{_includedir}/cpu_features/cpuinfo_ppc.h
+%{_includedir}/cpu_features/cpuinfo_x86.h
+%{_includedir}/cpu_features/cpu_features_macros.h
+%{_bindir}/list_cpu_features
+%{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets.cmake
+%{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets-relwithdebinfo.cmake
+%{_libdir}/cmake/CpuFeatures/CpuFeaturesConfig.cmake
+%{_libdir}/cmake/CpuFeatures/CpuFeaturesConfigVersion.cmake
+%endif
 
 %files -n SoftEtherVPN5-server
 %license SoftEtherVPN-%{V5_VERSION}/LICENSE
@@ -271,6 +302,7 @@ mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 %{_libexecdir}/softether5/vpnclient/hamcore.se2
 %{systemd_unit_path}/softether5-client.service
 
+%ifnarch %{nv4_arches}
 %files -n SoftEtherVPN4-common
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
 %{_libexecdir}/softether4
@@ -295,6 +327,7 @@ mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 %{_libexecdir}/softether4/vpnclient/vpnclient
 %{_libexecdir}/softether4/vpnclient/hamcore.se2
 %{systemd_unit_path}/softether4-client.service
+%endif
 
 %changelog
 {{{ git_dir_changelog }}}
