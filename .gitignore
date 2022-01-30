@@ -9,3 +9,4 @@ storybook-static
 .idea
 .env
 build_and_compile.sh
+.softether-patternfly-ui.template.spec.un~
