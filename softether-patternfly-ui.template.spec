@@ -239,11 +239,11 @@ pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
 mkdir -p %{buildroot}/%{_bindir}
 INSTALL_BINDIR=%{buildroot}/%{_bindir}/ INSTALL_VPNSERVER_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnserver/ INSTALL_VPNBRIDGE_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnbridge/ INSTALL_VPNCLIENT_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnclient/ INSTALL_VPNCMD_DIR=%{buildroot}/%{_libexecdir}/softether4/vpncmd/ make -e install
 rm -rf %{buildroot}/%{_bindir}
-mkdir -p %{buildroot}/%{_bindir}
 # Create systemd units
 %unit_gen "4" "server"
 %unit_gen "4" "bridge"
 %unit_gen "4" "client"
+mkdir -p %{buildroot}/%{_bindir}
 echo "#!/bin/sh
 %{_libexecdir}/softether4/vpncmd/vpncmd \"\$@\"
 exit $?" > %{buildroot}/%{_bindir}/vpncmd4
