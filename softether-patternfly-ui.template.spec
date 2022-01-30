@@ -221,17 +221,16 @@ mkdir -p %{buildroot}/%{_sysconfdir}/softether5
 # Install v5 and generate units
 pushd SoftEtherVPN-%{V5_VERSION}
 make DESTDIR=%{buildroot} -C build install
+# backup the only binary we want before losing it if needed
+%ifnarch %{ncpu_features}
+cp %{buildroot}/%{_bindir}/list_cpu_features %{buildroot}/list_cpu_features
+%endif
 rm -rf %{buildroot}/%{_bindir}
 mv %{buildroot}/%{_libexecdir}/softether %{buildroot}/%{_libexecdir}/softether5
 # Create systemd units
 %unit_gen "5" "server"
 %unit_gen "5" "bridge"
 %unit_gen "5" "client"
-mkdir -p %{buildroot}/%{_bindir}
-echo "#!/bin/sh
-%{_libexecdir}/softether5/vpncmd/vpncmd \"\$@\"
-exit $?" > %{buildroot}/%{_bindir}/vpncmd5
-chmod 755 %{buildroot}/%{_bindir}/vpncmd5
 
 # V4 if possible
 %ifnarch %{nv4_arches}
@@ -248,6 +247,15 @@ echo "#!/bin/sh
 %{_libexecdir}/softether4/vpncmd/vpncmd \"\$@\"
 exit $?" > %{buildroot}/%{_bindir}/vpncmd4
 chmod 755 %{buildroot}/%{_bindir}/vpncmd4
+%endif
+# now it is safe to create the script
+echo "#!/bin/sh
+%{_libexecdir}/softether5/vpncmd/vpncmd \"\$@\"
+exit $?" > %{buildroot}/%{_bindir}/vpncmd5
+chmod 755 %{buildroot}/%{_bindir}/vpncmd5
+# restore list_cpu_features if needed
+%ifnarch %{ncpu_features}
+mv %{buildroot}/list_cpu_features %{buildroot}/%{_bindir}/list_cpu_features
 %endif
 
 # Install sources
@@ -271,6 +279,7 @@ mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 %{_localstatedir}/log/softether5
 %{_libdir}/libcedar.so
 %{_libdir}/libmayaqua.so
+# in case the build uses cpu_features
 %ifnarch %{ncpu_features}
 %{_libdir}/libcpu_features.a
 %{_includedir}/cpu_features/cpuinfo_aarch64.h
