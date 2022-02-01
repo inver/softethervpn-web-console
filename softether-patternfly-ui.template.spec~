@@ -275,6 +275,7 @@ mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 %files -n SoftEtherVPN5-common
 %license SoftEtherVPN-%{V5_VERSION}/LICENSE
 %{_sysconfdir}/softether5
+%{_libexecdir}/softether5
 %{_libexecdir}/softether5/vpncmd/vpncmd
 %{_libexecdir}/softether5/vpncmd/hamcore.se2
 %{_bindir}/vpncmd5
@@ -319,6 +320,7 @@ mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 %ifnarch %{nv4_arches}
 %files -n SoftEtherVPN4-common
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
+%{_libexecdir}/softether4
 %{_libexecdir}/softether4/vpncmd/vpncmd
 %{_libexecdir}/softether4/vpncmd/hamcore.se2
 %{_bindir}/vpncmd4
