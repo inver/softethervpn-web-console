@@ -40,12 +40,12 @@ else\
 echo "[Unit]\
 Description=SoftEther%1 VPN %2\
 After=network.target auditd.service\
-ConditionPathExists=!%{_libexecdir}/softether%1/vpn%2/do_not_run\
+ConditionPathExists=!/opt/softether%1/vpn%2/do_not_run\
 \
 [Service]\
 Type=forking\
-ExecStart=%{_libexecdir}/softether%1/vpn%2/vpn%2 start\
-ExecStop=%{_libexecdir}/softether%1/vpn%2/vpn%2 stop\
+ExecStart=/opt/softether%1/vpn%2/vpn%2 start\
+ExecStop=/opt/softether%1/vpn%2/vpn%2 stop\
 KillMode=process\
 Restart=on-failure\
 \
@@ -54,7 +54,7 @@ PrivateTmp=yes\
 ProtectHome=yes\
 ProtectSystem=full\
 ReadOnlyPaths=/\
-ReadWritePaths=-%{_libexecdir}/softether%1/vpn%2\
+ReadWritePaths=-/opt/softether%1/vpn%2\
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_NET_BROADCAST CAP_NET_RAW CAP_SYS_NICE CAP_SYS_ADMIN CAP_SETUID\
 \
 [Install]\
@@ -240,7 +240,7 @@ mv %{buildroot}/%{_libexecdir}/softether %{buildroot}/%{_libexecdir}/softether5
 %ifnarch %{nv4_arches}
 pushd ../SoftEtherVPN_Stable-%{V4_VERSION}
 mkdir -p %{buildroot}/%{_bindir}
-INSTALL_BINDIR=%{buildroot}/%{_bindir}/ INSTALL_VPNSERVER_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnserver/ INSTALL_VPNBRIDGE_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnbridge/ INSTALL_VPNCLIENT_DIR=%{buildroot}/%{_libexecdir}/softether4/vpnclient/ INSTALL_VPNCMD_DIR=%{buildroot}/%{_libexecdir}/softether4/vpncmd/ make -e install
+INSTALL_BINDIR=%{buildroot}/%{_bindir}/ INSTALL_VPNSERVER_DIR=%{buildroot}/opt/softether4/vpnserver/ INSTALL_VPNBRIDGE_DIR=%{buildroot}/opt/softether4/vpnbridge/ INSTALL_VPNCLIENT_DIR=%{buildroot}/opt/softether4/vpnclient/ INSTALL_VPNCMD_DIR=%{buildroot}/opt/softether4/vpncmd/ make -e install
 rm -rf %{buildroot}/%{_bindir}
 # Create systemd units
 %unit_gen "4" "server"
@@ -248,7 +248,7 @@ rm -rf %{buildroot}/%{_bindir}
 %unit_gen "4" "client"
 mkdir -p %{buildroot}/%{_bindir}
 echo "#!/bin/sh
-%{_libexecdir}/softether4/vpncmd/vpncmd \"\$@\"
+/opt/softether4/vpncmd/vpncmd \"\$@\"
 exit $?" > %{buildroot}/%{_bindir}/vpncmd4
 chmod 755 %{buildroot}/%{_bindir}/vpncmd4
 %endif
@@ -319,26 +319,26 @@ mv master.zip %{buildroot}/%{_usrsrc}/SoftEtherVPN-patternfly-sources
 %ifnarch %{nv4_arches}
 %files -n SoftEtherVPN4-common
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
-%{_libexecdir}/softether4/vpncmd/vpncmd
-%{_libexecdir}/softether4/vpncmd/hamcore.se2
+/opt/softether4/vpncmd/vpncmd
+/opt/softether4/vpncmd/hamcore.se2
 %{_bindir}/vpncmd4
 
 %files -n SoftEtherVPN4-server
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
-%{_libexecdir}/softether4/vpnserver/vpnserver
-%{_libexecdir}/softether4/vpnserver/hamcore.se2
+/opt/softether4/vpnserver/vpnserver
+/opt/softether4/vpnserver/hamcore.se2
 %{systemd_unit_path}/softether4-server.service
 
 %files -n SoftEtherVPN4-bridge
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
-%{_libexecdir}/softether4/vpnbridge/vpnbridge
-%{_libexecdir}/softether4/vpnbridge/hamcore.se2
+/opt/softether4/vpnbridge/vpnbridge
+/opt/softether4/vpnbridge/hamcore.se2
 %{systemd_unit_path}/softether4-bridge.service
 
 %files -n SoftEtherVPN4-client
 %license SoftEtherVPN_Stable-%{V4_VERSION}/LICENSE
-%{_libexecdir}/softether4/vpnclient/vpnclient
-%{_libexecdir}/softether4/vpnclient/hamcore.se2
+/opt/softether4/vpnclient/vpnclient
+/opt/softether4/vpnclient/hamcore.se2
 %{systemd_unit_path}/softether4-client.service
 %endif
 
