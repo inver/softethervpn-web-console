@@ -29,6 +29,6 @@
     "**/*.tsx",
     "**/*.jsx",
     "**/*.js"
-  ],
+, "webpack.dev.js"  ],
   "exclude": ["node_modules"]
 }

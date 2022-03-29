@@ -26,7 +26,7 @@
     "build:storybook": "build-storybook"
   },
   "devDependencies": {
-    "@axe-core/react": "^4.3.2",
+    "@axe-core/react": "^4.4.2",
     "@storybook/addon-actions": "^6.1.11",
     "@storybook/addon-info": "^5.3.21",
     "@storybook/addon-links": "^6.1.11",
@@ -46,7 +46,7 @@
     "enzyme": "^3.7.0",
     "enzyme-adapter-react-16": "^1.15.6",
     "enzyme-to-json": "^3.6.1",
-    "eslint": "^7.17.0",
+    "eslint": "^8.12.0",
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "file-loader": "^6.2.0",
@@ -72,8 +72,8 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.36.2",
     "webpack-bundle-analyzer": "^4.4.1",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^3.11.3",
     "webpack-merge": "^5.7.3"
   },
   "dependencies": {
@@ -88,6 +88,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-last-location": "^2.0.1",
+    "renderkid": "^2.0.7",
     "sirv-cli": "^1.0.10",
     "stream-browserify": "^2.0.2",
     "stream-http": "^2.8.3",
