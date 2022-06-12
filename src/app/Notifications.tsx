@@ -16,11 +16,11 @@ class ToastAlertGroup extends React.Component { // pass a boolean 'add' to the c
 
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-      if(nextProps.add){
-        this.addAlert(nextProps.title, nextProps.variant, nextProps.child, () => (new Date().getTime()));
-      }
-   }
+  componentDidUpdate(prevProps){
+    if(this.props.add != prevProps.add && this.props.add){
+      this.addAlert(this.props.title, this.props.variant, this.props.child, () => (new Date().getTime()));
+    }
+  }
 
   render() {
     // const btnClasses = ['pf-c-button', 'pf-m-secondary'].join(' ');
