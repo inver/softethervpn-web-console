@@ -301,9 +301,9 @@ class OpenVPNGalleryItem extends React.Component {
     this.handleSwitchChange = (isChecked, object) => {
       const id = object.target.id;
       const param: VPN.VpnOpenVpnSstpConfig = new VPN.VpnOpenVpnSstpConfig({
-        EnableOpenVPN_bool: id == "openvpn" ? isChecked: this.state.openvpn,
+        EnableOpenVPN_bool: id === "openvpn" ? isChecked: this.state.openvpn,
         OpenVPNPortList_str: this.state.ports,
-        EnableSSTP_bool: "sstp" ? isChecked : this.state.sstp
+        EnableSSTP_bool: id === "sstp" ? isChecked : this.state.sstp
       });
 
       api.SetOpenVpnSstpConfig(param)
