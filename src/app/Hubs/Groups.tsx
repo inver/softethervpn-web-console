@@ -33,7 +33,7 @@ import {
 } from '@patternfly/react-icons';
 import { GroupSettings } from '@app/Hubs/GroupSettings';
 import { DeletionModal } from '@app/DeletionModal';
-import { ToastAlertGroup } from '@app/Hubs/Notifications';
+import { ToastAlertGroup } from '@app/Notifications';
 import { GroupInfo } from '@app/Hubs/GroupInfo';
 import { GroupMemberList } from '@app/Hubs/GroupMemebersList';
 import { api } from '@app/utils/vpnrpc_settings';

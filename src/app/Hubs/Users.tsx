@@ -34,7 +34,7 @@ import {
 import { UserSettings } from '@app/Hubs/UserSettings';
 import { UserInfoTable } from '@app/Hubs/UserInfo';
 import { DeletionModal } from '@app/DeletionModal';
-import { ToastAlertGroup } from '@app/Hubs/Notifications';
+import { ToastAlertGroup } from '@app/Notifications';
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 

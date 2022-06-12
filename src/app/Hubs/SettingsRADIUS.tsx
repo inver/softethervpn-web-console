@@ -14,7 +14,7 @@ import {
   CardFooter,
   CardHeader
 } from '@patternfly/react-core';
-import { ToastAlertGroup } from '@app/Hubs/Notifications';
+import { ToastAlertGroup } from '@app/Notifications';
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 

@@ -17,7 +17,7 @@ import {
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 import { truncate_qm } from '@app/utils/string_utils';
-import { ToastAlertGroup } from '@app/Hubs/Notifications';
+import { ToastAlertGroup } from '@app/Notifications';
 import { infoListGlobal } from  '@app/index';
 
 class Properties extends React.Component {
