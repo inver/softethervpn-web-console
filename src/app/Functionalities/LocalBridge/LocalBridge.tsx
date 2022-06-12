@@ -38,6 +38,7 @@ import {
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 import { isTapSupported } from '@app/index';
+import { ToastAlertGroup } from '@app/Notifications'
 
 const emptyTable = {
       heightAuto: true,
@@ -130,6 +131,10 @@ class LocalBridgeCard extends React.Component {
       tap: false,
       isDeleteDisabled: true,
       canSelectAll: false,
+      showAlert: false,
+      alertTitle: "",
+      alertVariant: 'info',
+      alertBody: ""
     };
 
 
@@ -197,14 +202,28 @@ class LocalBridgeCard extends React.Component {
             DeviceName_str: row.cells[3],
             HubNameLB_str: row.cells[2]
           });
+          const alertObject = {
+            title: "",
+            variant: 'info',
+            body: ""
+          }
 
           api.DeleteLocalBridge(param)
           .then( () => {
             if(selectedCounter == counter){
               this.setState({ loading: true });
+              alertObject.title = param.DeviceName_str + " has been deleted";
+              alertObject.variant = 'info';
+              alertObject.body = "";
+              this.onAlert(alertObject);
             }
           })
-          .catch( error => { console.log(error) });
+          .catch( error => {
+            alertObject.title = "An error has occurred";
+            alertObject.variant = 'danger';
+            alertObject.body = error.toString();
+            this.onAlert(alertObject);
+          });
         }
       });
     };
@@ -224,14 +243,30 @@ class LocalBridgeCard extends React.Component {
         HubNameLB_str: this.state.selectedHub,
         TapMode_bool: this.state.tap
       });
+      const alertObject = {
+        title: "",
+        variant: 'info',
+        body: ""
+      }
 
       api.AddLocalBridge(param)
       .then( () => {
         this.setState({ loading: true });
+        alertObject.title = "A new local bridge has been created";
+        alertObject.variant = 'info';
+        alertObject.body = "";
+        this.onAlert(alertObject);
       })
-      .catch( error => { console.log(error) });
+      .catch( error => {
+        alertObject.title = "An error has occurred";
+        alertObject.variant = 'danger';
+        alertObject.body = error.toString();
+        this.onAlert(alertObject);
+      });
 
     };
+
+    this.onAlert = this.onAlert.bind(this);
   }
 
   loadTable(){
@@ -365,6 +400,16 @@ class LocalBridgeCard extends React.Component {
     });
   }
 
+  onAlert(alert: object) {
+    this.setState({
+      showAlert: true,
+      alertTitle: alert.title,
+      alertVariant: alert.variant,
+      alertBody: alert.body
+    });
+    this.setState({ showAlert: false });
+  }
+
 
   componentDidMount(){
     this.loadTable()
@@ -393,7 +438,11 @@ class LocalBridgeCard extends React.Component {
       adapter,
       tap,
       isDeleteDisabled,
-      canSelectAll
+      canSelectAll,
+      showAlert,
+      alertTitle,
+      alertVariant,
+      alertBody
     } = this.state;
 
     return (
@@ -519,6 +568,7 @@ class LocalBridgeCard extends React.Component {
       </Stack>
       </CardBody>
       </Card>
+      <ToastAlertGroup title={alertTitle} variant={alertVariant} child={alertBody} add={showAlert}/>
       </React.Fragment>
     );
   }
