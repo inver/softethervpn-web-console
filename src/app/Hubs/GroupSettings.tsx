@@ -61,11 +61,11 @@ class GroupSettings extends React.Component {
     this.onAlert = this.onAlert.bind(this);
   }
 
-  onAlert(alertObject: object): void {
+  onAlert(alertObject: object) {
     this.props.onAlert(alertObject);
   }
 
-  saveGroup(): void {
+  saveGroup() {
     const param = this.state.groupObject;
     const alertObject = {
       title: "",
@@ -107,11 +107,13 @@ class GroupSettings extends React.Component {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Readonly<RouteComponentProps<{ tag: string }>>): void {
+  componentDidUpdate(prevProps){
     if(!this.props.create){
-      this.setState({
-        groupObject: nextProps.group
-      })
+      if(this.props.group != prevProps.group){
+        this.setState({
+          groupObject: this.props.group
+        });
+      }
     }
   }
 

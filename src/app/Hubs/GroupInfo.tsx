@@ -26,8 +26,10 @@ class GroupInfo extends React.Component {
     this.onRefreshClick = this.onRefreshClick.bind(this);
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps): void {
-    this.setState({ groupObject: nextProps.group })
+  componentDidUpdate(prevProps){
+    if(this.props.group != prevProps.group){
+      this.setState({ groupObject: this.props.group });
+    }
   }
 
   onRefreshClick() {

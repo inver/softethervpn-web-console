@@ -76,8 +76,10 @@ class PolicyModal extends React.Component {
     };
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({ subjectObject: nextProps.subject })
+  componentDidUpdate(prevProps){
+    if(this.props.subject != prevProps.subject){
+      this.setState({ subjectObject: nextProps.subject });
+    }
   }
 
   render() {

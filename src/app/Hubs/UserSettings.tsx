@@ -340,10 +340,11 @@ class UserSettings extends React.Component {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps){
     if(!this.props.create){
-      const userObject = this.state.userObject;
-      const user = nextProps.user;
+      if(this.props.user != prevProps.user){
+        const userObject = this.state.userObject;
+      const user = this.props.user;
 
       Object.keys(user).forEach( key => {
         userObject[key] = user[key];
@@ -352,8 +353,9 @@ class UserSettings extends React.Component {
       this.initializeExtras(userObject)
 
       this.setState({ userObject });
+      }
     }
-   }
+  }
 
   render() {
     const {
