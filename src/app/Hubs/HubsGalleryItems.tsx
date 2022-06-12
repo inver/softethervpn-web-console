@@ -47,7 +47,7 @@ function nuToType(hubnum: number): string
 }
 
 class HubsGalleryItems extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -155,11 +155,11 @@ class HubsGalleryItems extends React.Component {
     });
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     this.loadHubs()
   }
 
-  render(): React.Fragment {
+  render() {
     const {
       hublist,
       toggle,

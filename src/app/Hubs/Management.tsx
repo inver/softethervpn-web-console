@@ -43,7 +43,7 @@ const SubsectionTitles = {
 }
 
 class Management extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -79,7 +79,7 @@ class Management extends React.Component {
     }
   }
 
-  render(): React.Fragment {
+  render() {
     const { hub, subsection } = this.state;
 
     return(

@@ -49,7 +49,7 @@ function hexToBase64(str: string)
 }
 
 class UserSettings extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.groupAuthItems = [
@@ -262,11 +262,11 @@ class UserSettings extends React.Component {
     this.onAlert = this.onAlert.bind(this);
   }
 
-  onAlert(alertObject: object): void {
+  onAlert(alertObject: object) {
     this.props.onAlert(alertObject);
   }
 
-  saveUser(): void {
+  saveUser() {
     const param = this.state.userObject;
     param.UserX_bin = new TextEncoder().encode(param.UserX_bin);
     const alertObject = {
@@ -325,7 +325,7 @@ class UserSettings extends React.Component {
     this.setState({ expires, specifyUser, specifyUserValue, serialNumber, limitCN, limitSN });
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     if(!this.props.create){
       const userObject = this.state.userObject;
       const user = this.props.user;
@@ -340,7 +340,7 @@ class UserSettings extends React.Component {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Readonly<RouteComponentProps<{ tag: string }>>): void {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if(!this.props.create){
       const userObject = this.state.userObject;
       const user = nextProps.user;
@@ -355,7 +355,7 @@ class UserSettings extends React.Component {
     }
    }
 
-  render(): React.Component {
+  render() {
     const {
       userObject,
       create,

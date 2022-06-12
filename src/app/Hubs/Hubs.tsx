@@ -10,11 +10,11 @@ import { HubStatus } from '@app/Hubs/Status';
 
 
 class Hubs extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
   }
 
-  render(): React.Fragment {
+  render() {
     let hub;
     let mode;
     const url = this.props.location.pathname;

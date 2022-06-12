@@ -86,7 +86,7 @@ const routes: AppRouteConfig[] = [
         label: 'Layer 3 Switch',
         path: '/functionalities/layer3switch',
         title: 'SoftEther VPN Console | Layer 3 Switch',
-        isBridge: false
+        isBridge: false,
       },
       {
         component: LegacyProtocols,
@@ -95,7 +95,7 @@ const routes: AppRouteConfig[] = [
         label: 'Legacy Protocols',
         path: '/functionalities/legacyprotocols',
         title: 'SoftEther VPN Console | Legacy Protocols',
-        isBridge: false
+        isBridge: false,
       },
       {
         component: EtherIPDetailed,
@@ -111,7 +111,7 @@ const routes: AppRouteConfig[] = [
         label: 'Dynamic DNS',
         path: '/functionalities/ddns',
         title: 'SoftEther VPN Console | Dynamic DNS',
-        isBridge: false
+        isBridge: false,
       },
       {
         component: VpnAzure,
@@ -120,7 +120,7 @@ const routes: AppRouteConfig[] = [
         label: 'VPN Azure',
         path: '/functionalities/vpnazure',
         title: 'SoftEther VPN Console | VPN Azure',
-        isBridge: false
+        isBridge: false,
       },
     ],
     isAdmin: true,

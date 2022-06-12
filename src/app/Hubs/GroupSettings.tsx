@@ -20,7 +20,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 
 
 class GroupSettings extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {

@@ -19,7 +19,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class IcmpDnsCard extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -67,7 +67,7 @@ class IcmpDnsCard extends React.Component {
   }
 
 
-  render(): void {
+  render() {
     const { loading, isModalOpen, icmp, dns } = this.state;
 
     return(

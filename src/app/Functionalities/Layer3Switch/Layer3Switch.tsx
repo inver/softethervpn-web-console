@@ -36,98 +36,98 @@ import { NewIfModal } from '@app/Functionalities/Layer3Switch/NewIfModal';
 import { NewRouteModal } from '@app/Functionalities/Layer3Switch/NewRouteModal';
 
 const emptyRoutes = {
-      heightAuto: true,
-      cells: [
-        {
-          props: { colSpan: 8 },
-          title: (
-            <Bullseye>
-              <EmptyState variant={EmptyStateVariant.small}>
-                <EmptyStateBody>
-                  Select a switch or create a new Routing Table.
-                </EmptyStateBody>
-              </EmptyState>
-            </Bullseye>
-          )
-        }
-      ],
-      disableSelection: true
-    };
+  heightAuto: true,
+  cells: [
+    {
+      props: { colSpan: 8 },
+      title: (
+        <Bullseye>
+          <EmptyState variant={EmptyStateVariant.small}>
+            <EmptyStateBody>
+              Select a switch or create a new Routing Table.
+            </EmptyStateBody>
+          </EmptyState>
+        </Bullseye>
+      )
+    }
+  ],
+  disableSelection: true
+};
 
 const emptyIfs = {
-      heightAuto: true,
-      cells: [
-        {
-          props: { colSpan: 8 },
-          title: (
-            <Bullseye>
-              <EmptyState variant={EmptyStateVariant.small}>
-                <EmptyStateBody>
-                  Select a switch or create a new Virtual Interface.
-                </EmptyStateBody>
-              </EmptyState>
-            </Bullseye>
-          )
-        }
-      ],
-      disableSelection: true
-    };
+  heightAuto: true,
+  cells: [
+    {
+      props: { colSpan: 8 },
+      title: (
+        <Bullseye>
+          <EmptyState variant={EmptyStateVariant.small}>
+            <EmptyStateBody>
+              Select a switch or create a new Virtual Interface.
+            </EmptyStateBody>
+          </EmptyState>
+        </Bullseye>
+      )
+    }
+  ],
+  disableSelection: true
+};
 
 const emptyTable = {
-      heightAuto: true,
-      cells: [
-        {
-          props: { colSpan: 8 },
-          title: (
-            <Bullseye>
-              <EmptyState variant={EmptyStateVariant.small}>
+  heightAuto: true,
+  cells: [
+    {
+      props: { colSpan: 8 },
+      title: (
+        <Bullseye>
+          <EmptyState variant={EmptyStateVariant.small}>
 
-                <Title headingLevel="h2" size="lg">
-                  No Virtual Layer 3 Switch is defined
-                </Title>
-                <EmptyStateBody>
-                  A Virtual Layer 3 Switch has not yet been created. You can create one with by clicking on &ldquo;New&rdquo;.
-                </EmptyStateBody>
-              </EmptyState>
-            </Bullseye>
-          )
-        }
-      ],
-      disableSelection: true
-    };
+            <Title headingLevel="h2" size="lg">
+              No Virtual Layer 3 Switch is defined
+            </Title>
+            <EmptyStateBody>
+              A Virtual Layer 3 Switch has not yet been created. You can create one with by clicking on &ldquo;New&rdquo;.
+            </EmptyStateBody>
+          </EmptyState>
+        </Bullseye>
+      )
+    }
+  ],
+  disableSelection: true
+};
 
 
 
 const Layer3Switch: React.FunctionComponent = () => (
   <React.Fragment>
-  <PageSection variant={PageSectionVariants.light}>
-  <Stack hasGutter>
-  <StackItem>
-  <TextContent>
-    <Title headingLevel="h1" size="lg">Virtual Layer 3 Switch</Title>
-    <Text component="p">
-    You can define Virtual Layer 3 Switches between two or more Virtual Hubs operating on this VPN Server to achieve routing between different IP networks.
-    </Text>
-  </TextContent>
-  </StackItem>
-  <StackItem>
-    <Alert variant="warning" isInline title="Cautions about Virtual Layer 3 Switch">
-      The Virtual Layer 3 Switch functions are provided for network administrators or people who know a lot about networking and IP routing. If you are using the regular VPN functions, you do not need to use the Virtual Layer 3 Switch functions.
-      <br/>
-      If the Virtual Layer 3 Switch functions are to be used, the person who configures them must have sufficient knowledge of IP routing.
-    </Alert>
-  </StackItem>
-  </Stack>
-  </PageSection>
-  <Divider component="div" />
-  <PageSection>
-    <DefinedVL3SCard />
-  </PageSection>
+    <PageSection variant={PageSectionVariants.light}>
+      <Stack hasGutter>
+        <StackItem>
+          <TextContent>
+            <Title headingLevel="h1" size="lg">Virtual Layer 3 Switch</Title>
+            <Text component="p">
+              You can define Virtual Layer 3 Switches between two or more Virtual Hubs operating on this VPN Server to achieve routing between different IP networks.
+            </Text>
+          </TextContent>
+        </StackItem>
+        <StackItem>
+          <Alert variant="warning" isInline title="Cautions about Virtual Layer 3 Switch">
+            The Virtual Layer 3 Switch functions are provided for network administrators or people who know a lot about networking and IP routing. If you are using the regular VPN functions, you do not need to use the Virtual Layer 3 Switch functions.
+            <br />
+            If the Virtual Layer 3 Switch functions are to be used, the person who configures them must have sufficient knowledge of IP routing.
+          </Alert>
+        </StackItem>
+      </Stack>
+    </PageSection>
+    <Divider component="div" />
+    <PageSection>
+      <DefinedVL3SCard />
+    </PageSection>
   </React.Fragment>
 )
 
 class DefinedVL3SCard extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
 
     this.switchesCols = ['Layer 3 Switch Name', 'Running Status', 'Interfaces', 'Routing Tables'];
@@ -154,18 +154,18 @@ class DefinedVL3SCard extends React.Component {
       });
 
       api.StartL3Switch(param)
-      .then( () => {
-        const rows = this.state.switchesRows.map(oneRow => {
-          if(oneRow.cells[0] == name){
-            oneRow.cells[1] = "Running";
-          }
-          return oneRow;
+        .then(() => {
+          const rows = this.state.switchesRows.map(oneRow => {
+            if (oneRow.cells[0] == name) {
+              oneRow.cells[1] = "Running";
+            }
+            return oneRow;
+          });
+          this.setState({ switchesRows: rows })
+        })
+        .catch(error => {
+          console.log(error)
         });
-        this.setState({ switchesRows: rows })
-      })
-      .catch( error => {
-        console.log(error)
-      });
     };
 
     this.handleStopClick = () => {
@@ -175,43 +175,43 @@ class DefinedVL3SCard extends React.Component {
       });
 
       api.StopL3Switch(param)
-      .then( () => {
-        const rows = this.state.switchesRows.map(oneRow => {
-          if(oneRow.cells[0] == name){
-            oneRow.cells[1] = "Stopped";
-          }
-          return oneRow;
+        .then(() => {
+          const rows = this.state.switchesRows.map(oneRow => {
+            if (oneRow.cells[0] == name) {
+              oneRow.cells[1] = "Stopped";
+            }
+            return oneRow;
+          });
+          this.setState({ switchesRows: rows })
+        })
+        .catch(error => {
+          console.log(error)
         });
-        this.setState({ switchesRows: rows })
-      })
-      .catch( error => {
-        console.log(error)
-      });
     };
 
     this.handleDelIfClick = () => {
       const name = this.state.selectedSwitch.cells[0];
       this.state.ifList.forEach(iF => {
-        if(iF.selected){
+        if (iF.selected) {
           const param: VPN.VpnRpcL3If = new VPN.VpnRpcL3If({
             Name_str: name,
             HubName_str: iF.cells[2]
           });
 
           api.DelL3If(param)
-          .then( () => {
-            this.loadIfs(name)
-            const rows = this.state.switchesRows.map(oneRow => {
-              if(oneRow.cells[0] == name){
-                oneRow.cells[2] --;
-              }
-              return oneRow;
+            .then(() => {
+              this.loadIfs(name)
+              const rows = this.state.switchesRows.map(oneRow => {
+                if (oneRow.cells[0] == name) {
+                  oneRow.cells[2]--;
+                }
+                return oneRow;
+              });
+              this.setState({ switchesRows: rows, isIfSelected: false });
+            })
+            .catch(error => {
+              console.log(error)
             });
-            this.setState({ switchesRows: rows, isIfSelected: false });
-          })
-          .catch( error => {
-            console.log(error)
-          });
         }
       });
     };
@@ -219,7 +219,7 @@ class DefinedVL3SCard extends React.Component {
     this.handleDelRouteClick = () => {
       const name = this.state.selectedSwitch.cells[0];
       this.state.routesList.forEach(route => {
-        if(route.selected){
+        if (route.selected) {
           const param: VPN.VpnRpcL3If = new VPN.VpnRpcL3If({
             Name_str: name,
             NetworkAddress_ip: route.cells[0],
@@ -229,19 +229,19 @@ class DefinedVL3SCard extends React.Component {
           });
 
           api.DelL3Table(param)
-          .then( () => {
-            this.loadRoutesTable(name)
-            const rows = this.state.switchesRows.map(oneRow => {
-              if(oneRow.cells[0] == name){
-                oneRow.cells[3] --;
-              }
-              return oneRow;
+            .then(() => {
+              this.loadRoutesTable(name)
+              const rows = this.state.switchesRows.map(oneRow => {
+                if (oneRow.cells[0] == name) {
+                  oneRow.cells[3]--;
+                }
+                return oneRow;
+              });
+              this.setState({ switchesRows: rows, isRouteSelected: false });
+            })
+            .catch(error => {
+              console.log(error)
             });
-            this.setState({ switchesRows: rows, isRouteSelected: false });
-          })
-          .catch( error => {
-            console.log(error)
-          });
         }
       });
     };
@@ -252,12 +252,12 @@ class DefinedVL3SCard extends React.Component {
       });
 
       api.DelL3Switch(param)
-      .then( () => {
-        this.handleSwitchUpdate();
-      })
-      .catch( error => {
-        console.log(error)
-      })
+        .then(() => {
+          this.handleSwitchUpdate();
+        })
+        .catch(error => {
+          console.log(error)
+        })
     };
   }
 
@@ -265,7 +265,7 @@ class DefinedVL3SCard extends React.Component {
     let selected = null;
     const rows = this.state.switchesRows.map((oneRow, index) => {
       oneRow.selected = rowId === index;
-      if(oneRow.selected){
+      if (oneRow.selected) {
         selected = oneRow;
         this.loadIfs(selected.cells[0]);
         this.loadRoutesTable(selected.cells[0]);
@@ -273,10 +273,12 @@ class DefinedVL3SCard extends React.Component {
       return oneRow;
     });
     console.log(selected)
+
     this.setState({
       switchesRows: rows,
       selectedSwitch: selected,
     });
+
   }
 
   onSelectIf(event, isSelected, rowId) {
@@ -291,13 +293,14 @@ class DefinedVL3SCard extends React.Component {
     } else {
       rows = [...this.state.ifList];
       rows[rowId].selected = isSelected;
-      rows.map( oneRow => {
-        if(oneRow.selected){
+      rows.map(oneRow => {
+        if (oneRow.selected) {
           selected = true;
           return;
         }
       });
     }
+
     this.setState({
       ifList: rows,
       isIfSelected: selected,
@@ -316,8 +319,8 @@ class DefinedVL3SCard extends React.Component {
     } else {
       rows = [...this.state.routesList];
       rows[rowId].selected = isSelected;
-      rows.map( oneRow => {
-        if(oneRow.selected){
+      rows.map(oneRow => {
+        if (oneRow.selected) {
           selected = true;
           return;
         }
@@ -329,89 +332,95 @@ class DefinedVL3SCard extends React.Component {
     });
   }
 
-  loadSwitches(){
+  loadSwitches() {
     api.EnumL3Switch()
-    .then( response => {
-      let rows = [];
-      if(response.L3SWList.length > 0){
-        response.L3SWList.forEach(l3sw => {
-          const row = { cells: [
-            l3sw.Name_str,
-            l3sw.Online_bool ? "Running" : "Stopped",
-            l3sw.NumInterfaces_u32,
-            l3sw.NumTables_u32,
-          ]};
-          rows.push(row);
-        });
-      }
-      else{
-        rows = [emptyTable];
-      }
+      .then(response => {
+        let rows = [];
+        if (response.L3SWList.length > 0) {
+          response.L3SWList.forEach(l3sw => {
+            const row = {
+              cells: [
+                l3sw.Name_str,
+                l3sw.Online_bool ? "Running" : "Stopped",
+                l3sw.NumInterfaces_u32,
+                l3sw.NumTables_u32,
+              ]
+            };
+            rows.push(row);
+          });
+        }
+        else {
+          rows = [emptyTable];
+        }
 
-      this.setState({ loading: false, switchesRows: rows });
-    })
-    .catch(error => console.log(error));
+        this.setState({ loading: false, switchesRows: rows });
+      })
+      .catch(error => console.log(error));
   }
 
-  loadIfs(name){
+  loadIfs(name) {
     const param: VPN.VpnRpcL3If = new VPN.VpnRpcL3If({
       Name_str: name
     });
 
     api.EnumL3If(param)
-    .then( response => {
-      let rows = [];
-      // let hubs = [];
-      if(response.L3IFList.length > 0){
-        response.L3IFList.forEach( iF => {
-          const row = { cells: [
-            iF.IpAddress_ip,
-            iF.SubnetMask_ip,
-            iF.HubName_str
-          ]};
-          rows.push(row)
-          // hubs.push(iF.HubName_str)
-        });
-      }
-      else{
-        rows = [emptyIfs];
-      }
+      .then(response => {
+        let rows = [];
+        // let hubs = [];
+        if (response.L3IFList.length > 0) {
+          response.L3IFList.forEach(iF => {
+            const row = {
+              cells: [
+                iF.IpAddress_ip,
+                iF.SubnetMask_ip,
+                iF.HubName_str
+              ]
+            };
+            rows.push(row)
+            // hubs.push(iF.HubName_str)
+          });
+        }
+        else {
+          rows = [emptyIfs];
+        }
 
-      this.setState({ ifList: rows });
-    })
-    .catch(error => console.log(error));
+        this.setState({ ifList: rows });
+      })
+      .catch(error => console.log(error));
   }
 
-  loadRoutesTable(name){
+  loadRoutesTable(name) {
 
     const param: VPN.VpnRpcL3Table = new VPN.VpnRpcL3Table({
       Name_str: name
     });
 
     api.EnumL3Table(param)
-    .then( response => {
-      let rows = [];
-      if(response.L3Table.length > 0){
-        response.L3Table.forEach( route => {
-          const row = { cells: [
-            route.NetworkAddress_ip,
-            route.SubnetMask_ip,
-            route.GatewayAddress_ip,
-            route.Metric_u32
-          ]};
-          rows.push(row)
-        });
-      }
-      else{
-        rows = [emptyRoutes];
-      }
+      .then(response => {
+        let rows = [];
+        if (response.L3Table.length > 0) {
+          response.L3Table.forEach(route => {
+            const row = {
+              cells: [
+                route.NetworkAddress_ip,
+                route.SubnetMask_ip,
+                route.GatewayAddress_ip,
+                route.Metric_u32
+              ]
+            };
+            rows.push(row)
+          });
+        }
+        else {
+          rows = [emptyRoutes];
+        }
 
-      this.setState({ routesList: rows });
-    })
-    .catch(error => console.log(error));
+        this.setState({ routesList: rows });
+      })
+      .catch(error => console.log(error));
   }
 
-  handleSwitchUpdate(){
+  handleSwitchUpdate() {
     this.loadSwitches()
     this.setState({
       ifList: [emptyIfs],
@@ -426,8 +435,8 @@ class DefinedVL3SCard extends React.Component {
     const name = this.state.selectedSwitch.cells[0];
     this.loadIfs(name);
     const rows = this.state.switchesRows.map(oneRow => {
-      if(oneRow.cells[0] == name){
-        oneRow.cells[2] ++;
+      if (oneRow.cells[0] == name) {
+        oneRow.cells[2]++;
       }
       return oneRow;
     });
@@ -438,19 +447,19 @@ class DefinedVL3SCard extends React.Component {
     const name = this.state.selectedSwitch.cells[0];
     this.loadRoutesTable(name);
     const rows = this.state.switchesRows.map(oneRow => {
-      if(oneRow.cells[0] == name){
-        oneRow.cells[3] ++;
+      if (oneRow.cells[0] == name) {
+        oneRow.cells[3]++;
       }
       return oneRow;
     });
     this.setState({ switchesRows: rows })
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.loadSwitches()
   }
 
-  render(){
+  render() {
     const {
       switchesRows,
       ifList,
@@ -468,15 +477,15 @@ class DefinedVL3SCard extends React.Component {
     let isDelIfDisabled: boolean;
     let isDelRouteDisabled: boolean;
     let deleteText = "";
-    if(selectedSwitch != null){
+    if (selectedSwitch != null) {
       isAddIfDisabled = selectedSwitch.cells[1] == "Running";
       isAddRouteDisabled = selectedSwitch.cells[1] == "Running";
       isDelIfDisabled = selectedSwitch.cells[1] == "Running" || !isIfSelected;
       isDelRouteDisabled = selectedSwitch.cells[1] == "Running" || !isRouteSelected;
-      deleteText = <Text>This will delete the Virtual Layer 3 Switch &ldquo;{selectedSwitch.cells[0]}&rdquo;.<br/>
-      Are you sure?</Text>
+      deleteText = <Text>This will delete the Virtual Layer 3 Switch &ldquo;{selectedSwitch.cells[0]}&rdquo;.<br />
+        Are you sure?</Text>
     }
-    else{
+    else {
       isAddIfDisabled = true;
       isAddRouteDisabled = true;
       isDelIfDisabled = true;
@@ -485,96 +494,135 @@ class DefinedVL3SCard extends React.Component {
 
 
 
-    return(
+    return (
       <React.Fragment>
-      <Stack hasGutter>
-      <StackItem>
-      <Card isFullHeight>
-      <CardBody>
-        <Table
-          onSelect={switchesRows[0].disableSelection ? "" : this.onSelectSwitch}
-          selectVariant={RowSelectVariant.radio}
-          aria-label="Virtual Layer 3 Switches Table"
-          variant='compact'
-          borders='compactBorderless'
-          cells={this.switchesCols}
-          rows={switchesRows}
-        >
-          <TableHeader />
-          <TableBody />
-        </Table>
-      </CardBody>
-      <CardFooter>
-      <Form>
-      <ActionGroup>
-      <NewSwitchModal switches={switchesRows.map(row => { return row.cells[0]})} onConfirm={this.handleSwitchUpdate}/>
-      <Button isDisabled={isStartDisabled} onClick={this.handleStartClick} >Start</Button>
-      <Button isDisabled={isStopDisabled} onClick={this.handleStopClick}>Stop</Button>
-      <DeletionModal modalText={deleteText} buttonText="Delete" isDisabled={isDeleteDisabled} onConfirm={this.handleConfirmClick}/>
-      </ActionGroup>
-      </Form>
-      </CardFooter>
-      </Card>
-      </StackItem>
-      <StackItem>
-      <Flex fullWidth={{ default: 'fullWidth' }}>
-      <FlexItem grow={{ default: 'grow'}}>
-      <Card isFullHeight>
-      <CardBody>
-        <Table
-          onSelect={ifList[0].disableSelection ? "" : this.onSelectIf}
-          canSelectAll={true}
-          selectVariant={RowSelectVariant.checkbox}
-          aria-label="Virtual Interfaces Table"
-          variant='compact'
-          borders='compactBorderless'
-          cells={this.ifCols}
-          rows={ifList}
-        >
-          <TableHeader />
-          <TableBody />
-        </Table>
-      </CardBody>
-      <CardFooter>
-      <Form>
-      <ActionGroup>
-      {isAddIfDisabled ? <Button isDisabled={true}>New Virtual Interface</Button> : <NewIfModal onConfirm={this.refreshIfList} Switch={selectedSwitch.cells[0]}/> }
-      <Button isDisabled={isDelIfDisabled} onClick={this.handleDelIfClick}>Delete Virtual Interface</Button>
-      </ActionGroup>
-      </Form>
-      </CardFooter>
-      </Card>
-      </FlexItem>
-      <FlexItem grow={{ default: 'grow'}}>
-      <Card isFullHeight>
-      <CardBody>
-        <Table
-          onSelect={routesList[0].disableSelection ? "" : this.onSelectRoute}
-          canSelectAll={true}
-          selectVariant={RowSelectVariant.checkbox}
-          aria-label="Routing Table Table"
-          variant='compact'
-          borders='compactBorderless'
-          cells={this.routeCols}
-          rows={routesList}
-        >
-          <TableHeader />
-          <TableBody />
-        </Table>
-      </CardBody>
-      <CardFooter>
-      <Form>
-      <ActionGroup>
-      {isAddRouteDisabled ? <Button isDisabled={true}>Add Routing Table Entry</Button> : <NewRouteModal onConfirm={this.refreshRouteList} Switch={selectedSwitch.cells[0]}/>}
-      <Button isDisabled={isDelRouteDisabled} onClick={this.handleDelRouteClick}>Delete Routing Table Entry</Button>
-      </ActionGroup>
-      </Form>
-      </CardFooter>
-      </Card>
-      </FlexItem>
-      </Flex>
-      </StackItem>
-      </Stack>
+        <Stack hasGutter>
+          <StackItem>
+            <Card isFullHeight>
+              <CardBody>
+                { switchesRows[0].disableSelection ?
+                <Table
+                  selectVariant={RowSelectVariant.radio}
+                  aria-label="Virtual Layer 3 Switches Table"
+                  variant='compact'
+                  cells={this.switchesCols}
+                  rows={switchesRows}
+                >
+                  <TableHeader />
+                  <TableBody />
+                </Table>
+                :
+                <Table
+                  onSelect={this.onSelectSwitch}
+                  selectVariant={RowSelectVariant.radio}
+                  aria-label="Virtual Layer 3 Switches Table"
+                  variant='compact'
+                  cells={this.switchesCols}
+                  rows={switchesRows}
+                >
+                  <TableHeader />
+                  <TableBody />
+                </Table>
+                }
+              </CardBody>
+              <CardFooter>
+                <Form>
+                  <ActionGroup>
+                    <NewSwitchModal switches={switchesRows.map(row => { return row.cells[0] })} onConfirm={this.handleSwitchUpdate} />
+                    <Button isDisabled={isStartDisabled} onClick={this.handleStartClick} >Start</Button>
+                    <Button isDisabled={isStopDisabled} onClick={this.handleStopClick}>Stop</Button>
+                    <DeletionModal modalText={deleteText} buttonText="Delete" isDisabled={isDeleteDisabled} onConfirm={this.handleConfirmClick} />
+                  </ActionGroup>
+                </Form>
+              </CardFooter>
+            </Card>
+          </StackItem>
+          <StackItem>
+            <Flex fullWidth={{ default: 'fullWidth' }}>
+              <FlexItem grow={{ default: 'grow' }}>
+                <Card isFullHeight>
+                  <CardBody>
+                    { switchesRows[0].disableSelection ?
+                    <Table
+                      canSelectAll={true}
+                      selectVariant={RowSelectVariant.checkbox}
+                      aria-label="Virtual Interfaces Table"
+                      variant='compact'
+                      cells={this.ifCols}
+                      rows={ifList}
+                    >
+                      <TableHeader />
+                      <TableBody />
+                    </Table>
+                    :
+                    <Table
+                      onSelect={this.onSelectIf}
+                      canSelectAll={true}
+                      selectVariant={RowSelectVariant.checkbox}
+                      aria-label="Virtual Interfaces Table"
+                      variant='compact'
+                      cells={this.ifCols}
+                      rows={ifList}
+                    >
+                      <TableHeader />
+                      <TableBody />
+                    </Table>
+                    }
+                  </CardBody>
+                  <CardFooter>
+                    <Form>
+                      <ActionGroup>
+                        {isAddIfDisabled ? <Button isDisabled={true}>New Virtual Interface</Button> : <NewIfModal onConfirm={this.refreshIfList} Switch={selectedSwitch.cells[0]} />}
+                        <Button isDisabled={isDelIfDisabled} onClick={this.handleDelIfClick}>Delete Virtual Interface</Button>
+                      </ActionGroup>
+                    </Form>
+                  </CardFooter>
+                </Card>
+              </FlexItem>
+              <FlexItem grow={{ default: 'grow' }}>
+                <Card isFullHeight>
+                  <CardBody>
+                    { 
+                    switchesRows[0].disableSelection ? 
+                    <Table 
+                      canSelectAll={true}
+                      selectVariant={RowSelectVariant.checkbox}
+                      aria-label="Routing Table Table"
+                      variant='compact'
+                      cells={this.routeCols}
+                      rows={routesList}
+                    >
+                         <TableHeader />
+                      <TableBody />
+                    </Table>
+                      :
+                      <Table 
+                      onSelect={this.onSelectRoute}
+                      canSelectAll={true}
+                      selectVariant={RowSelectVariant.checkbox}
+                      aria-label="Routing Table Table"
+                      variant='compact'
+                      cells={this.routeCols}
+                      rows={routesList}
+                    >
+                       <TableHeader />
+                      <TableBody />
+                    </Table>
+                    }
+                  </CardBody>
+                  <CardFooter>
+                    <Form>
+                      <ActionGroup>
+                        {isAddRouteDisabled ? <Button isDisabled={true}>Add Routing Table Entry</Button> : <NewRouteModal onConfirm={this.refreshRouteList} Switch={selectedSwitch.cells[0]} />}
+                        <Button isDisabled={isDelRouteDisabled} onClick={this.handleDelRouteClick}>Delete Routing Table Entry</Button>
+                      </ActionGroup>
+                    </Form>
+                  </CardFooter>
+                </Card>
+              </FlexItem>
+            </Flex>
+          </StackItem>
+        </Stack>
       </React.Fragment>
     );
   }

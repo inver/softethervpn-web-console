@@ -88,7 +88,7 @@ class HubStatus extends React.Component {
     this.state = { loading: true, hub: this.props.hub, hubObject: new VPN.VpnRpcHubStatus() };
   }
 
-  loadStatus(): void {
+  loadStatus() {
     const param: VPN.VpnRpcHubStatus = new VPN.VpnRpcHubStatus({
       HubName_str: this.state.hub
     });
@@ -102,11 +102,11 @@ class HubStatus extends React.Component {
     })
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     this.loadStatus()
   }
 
-  render(): React.Fragment {
+  render() {
     const { loading, hub, hubObject } = this.state;
     const formatted_hubObject = format_keys_and_values(hubObject);
 

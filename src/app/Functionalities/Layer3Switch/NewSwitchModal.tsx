@@ -13,7 +13,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class NewSwitchModal extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -63,7 +63,7 @@ class NewSwitchModal extends React.Component {
     }
   }
 
-  render(): void {
+  render() {
     const { isModalOpen, value, valid } = this.state;
 
     return(

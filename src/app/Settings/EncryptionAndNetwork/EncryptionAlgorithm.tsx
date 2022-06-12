@@ -19,7 +19,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class ServerEncryptionCard extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.options = [
@@ -90,7 +90,7 @@ class ServerEncryptionCard extends React.Component {
     };
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     api.GetServerCipher()
     .then( response => {
       this.setState({ loading: false, selected: response.String_str });
@@ -101,7 +101,7 @@ class ServerEncryptionCard extends React.Component {
 
   }
 
-  render(): void {
+  render() {
     const { loading, isOpen, selected, isDisabled, direction } = this.state;
 
 

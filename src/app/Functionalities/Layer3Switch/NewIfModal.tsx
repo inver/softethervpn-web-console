@@ -16,7 +16,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class NewIfModal extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.hubOptions = [<SelectOption key={0} value='Loading...' isPlaceholder />];
@@ -87,7 +87,7 @@ class NewIfModal extends React.Component {
     }
   }
 
-  loadHubs(): void {
+  loadHubs() {
     api.EnumHub()
     .then( response => {
       if( response.HubList.length > 0 ){
@@ -109,11 +109,11 @@ class NewIfModal extends React.Component {
     });
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     this.loadHubs()
   }
 
-  render(): React.Component {
+  render() {
     const {
       isModalOpen,
       isModalOpen,

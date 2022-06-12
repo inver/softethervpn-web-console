@@ -29,9 +29,8 @@ function deleteLabel(label: string) {
           delete subroute['label'];
         }
       });
-    }
-    else{
-      if(route.label == label){
+    } else {
+      if (route.label == label) {
         delete route['label'];
       }
     }
@@ -87,7 +86,7 @@ class SoftetherRouter extends React.Component {
       loadingCluster: true,
       loadigDDNSAzure: true,
       loadingCaps: true,
-      loadingInfo: true
+      loadingInfo: true,
     };
   }
 
@@ -123,7 +122,6 @@ class SoftetherRouter extends React.Component {
       .GetFarmSetting()
       .then((response) => {
         if (response.ServerType_u32 == 1 || response.ServerType_u32 == 2) {
-
           routes.forEach((route) => {
             if (isIAppRouteGroup(route)) {
               route.routes.forEach((subroute) => {
@@ -220,8 +218,8 @@ class SoftetherRouter extends React.Component {
         }
 
         // hide legacy Protocols
-        if(!isIpsecCapable && !isOpenVPNSupported && !isSSTPSupported){
-          deleteLabel('Legacy Protocols')
+        if (!isIpsecCapable && !isOpenVPNSupported && !isSSTPSupported) {
+          deleteLabel('Legacy Protocols');
         }
 
         if (isBridgeMode) {
@@ -247,12 +245,13 @@ class SoftetherRouter extends React.Component {
         this.setState({ loadingCaps: false });
       });
 
-      api.GetServerInfo()
-      .then(response => {
+    api
+      .GetServerInfo()
+      .then((response) => {
         infoListGlobal = response;
 
-        if(response.ServerType_u32 == 2){
-          deleteLabel("Hubs")
+        if (response.ServerType_u32 == 2) {
+          deleteLabel('Hubs');
         }
 
         this.setState({ loadingInfo: false });

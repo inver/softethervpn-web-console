@@ -22,7 +22,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class KeepAliveCard extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.minPort = 1;
@@ -139,7 +139,7 @@ class KeepAliveCard extends React.Component {
     };
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     api.GetKeep({})
     .then( response => {
 
@@ -170,7 +170,7 @@ class KeepAliveCard extends React.Component {
     });
   }
 
-  render(): void {
+  render() {
     const { loading, useFunction, hostValue, portValue, intervalValue, tcp, udp } = this.state;
 
     return(

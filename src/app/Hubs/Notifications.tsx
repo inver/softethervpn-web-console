@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, AlertGroup, AlertActionCloseButton, AlertVariant } from '@patternfly/react-core';
 
 class ToastAlertGroup extends React.Component { // pass a boolean 'add' to the class and remember to make it false to avoid continuing spawining alerts at every click
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>) {
+  constructor(props) {
     super(props);
     this.state = { alerts: [] };
     this.addAlert = (title, variant, child, key) => {
@@ -16,13 +16,13 @@ class ToastAlertGroup extends React.Component { // pass a boolean 'add' to the c
 
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Readonly<RouteComponentProps<{ tag: string }>>): void {
+  UNSAFE_componentWillReceiveProps(nextProps) {
       if(nextProps.add){
         this.addAlert(nextProps.title, nextProps.variant, nextProps.child, () => (new Date().getTime()));
       }
    }
 
-  render(): React.Fragment {
+  render() {
     // const btnClasses = ['pf-c-button', 'pf-m-secondary'].join(' ');
     // const getUniqueId = () => (new Date().getTime());
     // const addSuccessAlert = () => { this.addAlert('Toast Success Alert', 'success', getUniqueId()) };

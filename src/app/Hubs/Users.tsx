@@ -81,7 +81,7 @@ const columnNames = {
 }
 
 class UsersList extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -241,7 +241,7 @@ class UsersList extends React.Component {
     })
   }
 
-  loadUser(username: string): void {
+  loadUser(username: string) {
     const param: VPN.VpnRpcSetUser = new VPN.VpnRpcSetUser({
       HubName_str: this.state.hub,
       Name_str: username
@@ -254,11 +254,11 @@ class UsersList extends React.Component {
     .catch( error => console.log(error))
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     this.loadUsers()
   }
 
-  render(): React.Component {
+  render() {
      const {
        hub,
        rows,

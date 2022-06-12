@@ -21,7 +21,7 @@ import { ToastAlertGroup } from '@app/Hubs/Notifications';
 import { infoListGlobal } from  '@app/index';
 
 class Properties extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -136,7 +136,7 @@ class Properties extends React.Component {
     };
   }
 
-  loadHub(): void {
+  loadHub() {
     const param: VPN.VpnRpcCreateHub = new VPN.VpnRpcCreateHub({
       HubName_str: this.state.hub
     })

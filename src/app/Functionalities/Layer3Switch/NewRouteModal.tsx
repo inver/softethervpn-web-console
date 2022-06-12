@@ -17,7 +17,7 @@ import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
 
 class NewRouteModal extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.minValue = 1;
@@ -108,7 +108,7 @@ class NewRouteModal extends React.Component {
     }
   }
 
-  render(): void {
+  render() {
     const {
       isModalOpen,
       networkValue,

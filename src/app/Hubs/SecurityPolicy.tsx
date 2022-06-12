@@ -13,7 +13,7 @@ import {
 } from '@patternfly/react-core';
 
 class PolicyModal extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -76,11 +76,11 @@ class PolicyModal extends React.Component {
     };
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps: Readonly<RouteComponentProps<{ tag: string }>>): void {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({ subjectObject: nextProps.subject })
   }
 
-  render(): React.Fragment {
+  render() {
     const { isModalOpen, subjectObject } = this.state;
     const list = Object.keys(subjectObject).map( (key) => {
 

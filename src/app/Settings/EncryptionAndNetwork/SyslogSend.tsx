@@ -140,7 +140,7 @@ class SyslogCard extends React.Component {
 
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     api.GetSysLog({})
     .then( response => {
       const selected = numToString(response.SaveType_u32);
@@ -158,7 +158,7 @@ class SyslogCard extends React.Component {
     });
   }
 
-  render(): void {
+  render() {
     const { loading, selected, isOpen, hostValue, portValue } = this.state;
 
     return(

@@ -64,7 +64,7 @@ const columnNames = {
 }
 
 class GroupsList extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -171,7 +171,7 @@ class GroupsList extends React.Component {
     };
   }
 
-  loadGroups(): void {
+  loadGroups() {
     this.setState({ groupObject: new VPN.VpnRpcSetGroup(), isSelected: false })
     const param: VPN.VpnRpcEnumGroup = new VPN.VpnRpcEnumGroup({
       HubName_str: this.state.hub

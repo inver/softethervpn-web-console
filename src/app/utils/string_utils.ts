@@ -52,12 +52,11 @@ export function crt_field2object(asn_string: string) {
   return object;
 }
 
-export function truncate_qm(location: string): string
-{
+export function truncate_qm(location: string): string {
   let result = location;
-  const qm_index = location.indexOf("?");
-  if(qm_index != -1){
-    result = location.slice(0, qm_index)
+  const qm_index = location.indexOf('?');
+  if (qm_index != -1) {
+    result = location.slice(0, qm_index);
   }
   return result;
 }

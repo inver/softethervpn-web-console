@@ -33,7 +33,7 @@ function prettyHex(rawString: string): string
 
 // pass a "certBin={certificate_base64: string}" and a "buttonText={string: string}" props and optionally "isDisabled={bool: boolean}"
 class ViewCertModal extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>) {
+  constructor(props) {
     super(props);
     this.state = {
       isModalOpen: false,
@@ -43,18 +43,20 @@ class ViewCertModal extends React.Component {
       pubKey: "",
       signature: "",
     };
-    this.handleModalToggle = () => {
-      this.setState(({ isModalOpen }) => ({
-        isModalOpen: !isModalOpen
-      }));
-    };
+    this.handleModalToggle = this.handleModalToggle.bind(this);
 
-    this.onDownloadClick = () => {
-      downloadBlob(new Blob([this.state.cert.toString()], { type: "text/plain"}), this.state.issuedToObject["CN"] + ".pem");
-    };
+    this.onDownloadClick = this.onDownloadClick.bind(this);
   }
 
-  componentDidUpdate(): void {
+  handleModalToggle() {
+    this.setState({ isModalOpen: !this.state.isModalOpen });
+  }
+
+  onDownloadClick() {
+    downloadBlob(new Blob([this.state.cert.toString()], { type: "text/plain"}), this.state.issuedToObject["CN"] + ".pem");
+  }
+
+  componentDidUpdate(){
     if(this.props.certBin != null && this.state.cert == null ){
       const cert = new x509.X509Certificate(this.props.certBin);
 
@@ -77,7 +79,7 @@ class ViewCertModal extends React.Component {
     }
   }
 
-  render(): React.Component {
+  render() {
     const { isModalOpen, cert, issuedToObject, issuedByObject, pubKey, signature } = this.state;
 
 

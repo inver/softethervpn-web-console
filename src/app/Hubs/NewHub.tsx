@@ -24,7 +24,7 @@ import * as VPN from "vpnrpc/dist/vpnrpc";
 import { infoListGlobal } from  '@app/index';
 
 class NewHub extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
     this.state = {
       isNewHubModalOpen: false,
@@ -121,7 +121,7 @@ class NewHub extends React.Component {
     };
   }
 
-  render(): React.Fragment {
+  render() {
     const serverTypeInt = infoListGlobal.ServerType_u32;
     const {
       isNewHubModalOpen,

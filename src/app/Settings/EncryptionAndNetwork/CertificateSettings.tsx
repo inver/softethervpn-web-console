@@ -45,7 +45,7 @@ function formatKey(key: string): strings
 }
 
 class ServerCertificateCard extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -212,7 +212,7 @@ class ServerCertificateCard extends React.Component {
     };
   }
 
-  loadCert(): void {
+  loadCert() {
     api.GetServerCert()
     .then( response => {
       let cn: string;
@@ -242,12 +242,12 @@ class ServerCertificateCard extends React.Component {
     });
   }
 
-  componentDidMount(): void {
+  componentDidMount() {
     this.loadCert()
   }
 
 
-  render(): React.Component {
+  render() {
     const {
       loading,
       certBin,

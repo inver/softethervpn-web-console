@@ -5,7 +5,7 @@ import { Properties } from '@app/Hubs/Properties';
 import { SettingsRADIUS } from '@app/Hubs/SettingsRADIUS';
 
 class ManagementSubsection extends React.Component {
-    constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+    constructor(props){
         super(props);
     
         this.state = {
@@ -14,7 +14,7 @@ class ManagementSubsection extends React.Component {
         };
     }
 
-    render(): React.Fragment {
+    render() {
         const { hub, subsection } = this.state;
 
         return(
