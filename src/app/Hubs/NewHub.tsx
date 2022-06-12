@@ -121,7 +121,7 @@ class NewHub extends React.Component {
     };
   }
 
-  render(): React.Component {
+  render(): React.Fragment {
     const serverTypeInt = infoListGlobal.ServerType_u32;
     const {
       isNewHubModalOpen,

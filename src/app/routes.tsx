@@ -22,6 +22,7 @@ import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import { LastLocationProvider, useLastLocation } from 'react-router-last-location';
 
 let routeFocusTimer: number;
+
 export interface IAppRoute {
   label?: string; // Excluding the label will exclude the route from the nav sidebar in AppLayout
   /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -58,6 +59,13 @@ const routes: AppRouteConfig[] = [
     isAsync: true,
     label: 'Hubs',
     path: '/hubs',
+    title: 'SoftEther VPN Console | Hubs',
+  },
+  // We repeat the hub component to be able to have subpaths
+  // without rewriting too much code
+  {
+    component: Hubs,
+    path: '/hubs/:hub',
     title: 'SoftEther VPN Console | Hubs',
   },
   {

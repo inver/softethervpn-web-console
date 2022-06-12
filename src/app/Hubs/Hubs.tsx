@@ -14,10 +14,20 @@ class Hubs extends React.Component {
     super(props);
   }
 
-  render(): void {
-    const params = new URLSearchParams(this.props.location.search);
-    const hub = params.get('hub');
-    const mode = params.get('mode');
+  render(): React.Fragment {
+    let hub;
+    let mode;
+    const url = this.props.location.pathname;
+    const urlSplitted = url.split("/");
+    if (urlSplitted.shift() == "" && urlSplitted.shift() == "hubs"){
+      if (urlSplitted.length > 0){
+        hub = urlSplitted[0];
+      }
+  
+      if (urlSplitted.length > 1){
+        mode = urlSplitted[1];
+      }
+    }
 
     return (
       <React.Fragment>
@@ -29,7 +39,7 @@ class Hubs extends React.Component {
       </PageSection>
       :
       mode == "management" ?
-      <Management hub={hub} params={params}/> :
+      <Management hub={hub} /> :
       mode == "properties" ?
       <Properties hub={hub} /> :
       mode == "status" ?

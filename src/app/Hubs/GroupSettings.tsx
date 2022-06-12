@@ -115,7 +115,7 @@ class GroupSettings extends React.Component {
     }
   }
 
-  render(): React.Component {
+  render(): React.Fragment {
     const {
       groupObject,
       create,

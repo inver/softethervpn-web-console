@@ -16,7 +16,7 @@ import {
 
 
 class GroupInfo extends React.Component {
-  constructor(props: Readonly<RouteComponentProps<{ tag: string }>>){
+  constructor(props){
     super(props);
 
     this.state = {
@@ -34,7 +34,7 @@ class GroupInfo extends React.Component {
     this.props.onRefresh()
   }
 
-  render(): React.Component {
+  render(){
     const { groupObject } = this.state;
 
     return(

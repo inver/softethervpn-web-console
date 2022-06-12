@@ -230,7 +230,7 @@ class GroupsList extends React.Component {
     this.loadGroups()
   }
 
-  render(): React.Component {
+  render(){
     const {
       hub,
       rows,

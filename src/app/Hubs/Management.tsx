@@ -3,12 +3,16 @@ import {
   PageSection,
   PageSectionVariants,
   Divider,
-  TextContent,
-  Title,
-  Tabs,
-  Tab,
-  TabTitleText,
-  TabTitleIcon
+  Gallery,
+  GalleryItem,
+  Card,
+  CardTitle,
+  CardBody,
+  Menu,
+  MenuContent,
+  MenuItem,
+  Breadcrumb,
+  BreadcrumbItem
 } from '@patternfly/react-core';
 import {
   UserIcon,
@@ -29,17 +33,13 @@ import {
   PficonNetworkRangeIcon,
   OutlinedCommentsIcon
 } from '@patternfly/react-icons';
-import { Properties } from '@app/Hubs/Properties';
-import { UsersList } from '@app/Hubs/Users';
-import { GroupsList } from '@app/Hubs/Groups';
-import { SettingsRADIUS } from '@app/Hubs/SettingsRADIUS';
-import { truncate_qm } from '@app/utils/string_utils';
+import { ManagementSubsection } from '@app/Hubs/ManagementSubsection';
 
-const mapOfSecondary = {
-  0: 4,
-  1: 7,
-  2: null,
-  3: 14
+const SubsectionTitles = {
+  "users": "Users",
+  "groups": "Groups",
+  "properties": "Properties",
+  "radius": "RADIUS",
 }
 
 class Management extends React.Component {
@@ -48,96 +48,165 @@ class Management extends React.Component {
 
     this.state = {
       hub: this.props.hub,
-      activeTabKey: 0,
-      activeTabKeySecondary: 4
+      subsection: null
     };
-
-    // Toggle currently active tab
-    this.handleTabClick = (event, tabIndex) => {
-      this.setState({
-        activeTabKey: tabIndex,
-        activeTabKeySecondary: mapOfSecondary[tabIndex]
-      });
-    };
-
-    this.handleTabClickSecondary = (event, tabIndex) => {
-      mapOfSecondary[this.state.activeTabKey] = tabIndex;
-      this.setState({
-        activeTabKeySecondary: tabIndex
-      });
-    };
-  }
-
-  onLoadingError(): void {
-    window.location = truncate_qm(window.location.toString());
-  }
-
-  setUrlKeyParam(): void {
-    const pKey = this.state.activeTabKey;
-    const sKey = this.state.activeTabKeySecondary;
-
-    const params = this.props.params;
-    const current_pKey = params.get('pKey');
-    const current_sKey = params.get('sKey');
-
-    if(current_pKey == null){
-      window.location = window.location.toString() + "&pKey=" + pKey.toString();
-    }
-    else{
-      window.location = window.location.toString().replace("pKey=" + current_pKey, "pKey=" + pKey.toString());
-    }
-
-    if(sKey != null){
-      if(current_sKey == null){
-        window.location = window.location.toString() + "&sKey=" + sKey.toString();
-      }
-      else{
-        window.location = window.location.toString().replace("sKey=" + current_sKey, "sKey=" + sKey.toString());
-      }
-    }
-    else{
-      window.location = window.location.toString().replace("&sKey=" + current_sKey, "");
-    }
-  }
-
-  setTabFromUrl(): void {
-    const params = this.props.params;
-    const pKey = params.get('pKey');
-    const sKey = params.get('sKey');
-
-    if(pKey != null){
-      this.setState({
-        activeTabKey: Number(pKey)
-      })
-    }
-
-    if(sKey != null){
-      this.setState({
-        activeTabKeySecondary: Number(sKey)
-      })
-    }
   }
 
   componentDidMount(): void {
-    this.setTabFromUrl()
+    const url = window.location.hash.replace('#','');
+    const urlSplitted = url.split("/");
+    if (urlSplitted.shift() === "" && urlSplitted.shift() === "hubs" && urlSplitted.shift() === this.state.hub && urlSplitted.shift() === "management"){
+      if(urlSplitted.length === 1){
+        this.setState({ subsection: urlSplitted[0] });
+      }
+    }
   }
 
-  componentDidUpdate(): void {
-    this.setUrlKeyParam()
+  componentDidUpdate(prevProps, prevState): void {
+    const url = window.location.hash.replace('#','');
+    const urlSplitted = url.split("/");
+    if (urlSplitted.shift() === "" && urlSplitted.shift() === "hubs" && urlSplitted.shift() === this.state.hub && urlSplitted.shift() === "management"){
+      if(urlSplitted.length === 1){
+        if(urlSplitted[0] != prevState.subsection){
+          this.setState({ subsection: urlSplitted[0] });
+        }
+      }
+      else{
+        if(null != prevState.subsection){
+          this.setState({ subsection: null });
+        }
+      }
+    }
   }
 
-  render(): React.Component {
-    const { hub, activeTabKey, activeTabKeySecondary } = this.state;
+  render(): React.Fragment {
+    const { hub, subsection } = this.state;
+
     return(
       <React.Fragment>
-      <PageSection variant={PageSectionVariants.light}>
-      <TextContent>
-        <Title headingLevel="h1" size="lg">Virtual Hub &lsquo;{hub}&rsquo;</Title>
-      </TextContent>
-      </PageSection>
-      <Divider component="div" />
-      <PageSection variant={PageSectionVariants.light}>
-      <Tabs isFilled activeKey={activeTabKey} onSelect={this.handleTabClick} variant='default' isBox>
+        { subsection === null ?
+        <React.Fragment>
+        <PageSection variant={PageSectionVariants.light}>
+          <Breadcrumb>
+            <BreadcrumbItem to="#/hubs">Hubs</BreadcrumbItem>
+            <BreadcrumbItem>{hub}</BreadcrumbItem>
+            <BreadcrumbItem to={"#/hubs/" + hub + "/management"} isActive>Management</BreadcrumbItem>
+          </Breadcrumb>
+        </PageSection>
+        <Divider component="div" />
+        <PageSection variant={PageSectionVariants.grey}>
+          <Gallery
+          hasGutter
+          minWidths={{
+            md: '150px',
+            lg: '200px',
+            xl: '250px',
+            '2xl': '350px'
+          }}
+          >
+            <GalleryItem>
+              <Card isFullHeight>
+                <CardTitle><DatabaseIcon /> Security Database</CardTitle>
+                <CardBody>
+                  <Menu isPlain>
+                    <MenuContent>
+                      <MenuItem itemId={0} to={window.location.href + "/users"}>
+                        <UserIcon /> Users
+                      </MenuItem>
+                      <MenuItem itemId={1} to={window.location.href + "/groups"}>
+                        <UsersIcon /> Groups
+                      </MenuItem>
+                      <MenuItem itemId={2} isDisabled>
+                        <CheckCircleIcon /> Access Lists
+                      </MenuItem>
+                    </MenuContent>
+                  </Menu>
+                </CardBody>
+              </Card>
+            </GalleryItem>
+            <GalleryItem>
+              <Card isFullHeight>
+                <CardTitle><CogIcon/> Settings</CardTitle>
+                <CardBody>
+                  <Menu isPlain>
+                    <MenuContent>
+                      <MenuItem itemId={0} to={window.location.href + "/properties"}>
+                        <WrenchIcon/> Properties
+                      </MenuItem>
+                      <MenuItem itemId={1} to={window.location.href + "/radius"}>
+                        <ServerGroupIcon/> RADIUS
+                      </MenuItem>
+                      <MenuItem itemId={2} isDisabled>
+                        <InfrastructureIcon/> Cascade Connections
+                      </MenuItem>
+                      <MenuItem itemId={3}  isDisabled>
+                        <ServiceCatalogIcon/> Extended Options
+                      </MenuItem>
+                      <MenuItem itemId={4}  isDisabled>
+                        <DesktopIcon/> Admin Options
+                      </MenuItem>
+                      <MenuItem itemId={5}  isDisabled>
+                        <PficonNetworkRangeIcon/> IP Access Control
+                      </MenuItem>
+                      <MenuItem itemId={5}  isDisabled>
+                        <OutlinedCommentsIcon/> Connection Message
+                      </MenuItem>
+                    </MenuContent>
+                  </Menu>
+                </CardBody>
+              </Card>
+            </GalleryItem>
+            <GalleryItem>
+              <Card isFullHeight>
+                <CardTitle><ListIcon/> Sessions</CardTitle>
+              </Card>
+            </GalleryItem>
+            <GalleryItem>
+              <Card isFullHeight>
+                <CardTitle><BarsIcon/> Other</CardTitle>
+                <CardBody>
+                  <Menu isPlain>
+                    <MenuContent>
+                      <MenuItem itemId={0}  isDisabled>
+                        <OutlinedClockIcon/> Logs
+                      </MenuItem>
+                      <MenuItem itemId={1}  isDisabled>
+                        <KeyIcon/> Certificates
+                      </MenuItem>
+                      <MenuItem itemId={2}  isDisabled>
+                        <PortIcon/> Secure NAT
+                      </MenuItem>
+                    </MenuContent>
+                  </Menu>
+                </CardBody>
+              </Card>
+            </GalleryItem>
+          </Gallery>
+        </PageSection>
+        </React.Fragment>
+        :
+        <React.Fragment>
+        <PageSection variant={PageSectionVariants.light}>
+          <Breadcrumb>
+            <BreadcrumbItem to="#/hubs">Hubs</BreadcrumbItem>
+            <BreadcrumbItem>{hub}</BreadcrumbItem>
+            <BreadcrumbItem to={"#/hubs/" + hub + "/management"}>Management</BreadcrumbItem>
+            <BreadcrumbItem to={"#/hubs/" + hub + "/management/" + subsection} isActive>{SubsectionTitles[subsection]}</BreadcrumbItem>
+          </Breadcrumb>
+        </PageSection>
+        <PageSection variant={PageSectionVariants.grey}>
+          <ManagementSubsection hub={hub} subsection={subsection} />
+        </PageSection>
+        </React.Fragment>
+        }
+      </React.Fragment>
+    );
+  }
+}
+
+export { Management };
+
+      {/* <Tabs isFilled activeKey={activeTabKey} onSelect={this.handleTabClick} variant='default' isBox>
         <Tab eventKey={0} title={<><TabTitleIcon><DatabaseIcon/ ></TabTitleIcon><TabTitleText>Security Database</TabTitleText></>}>
           <Tabs isFilled isSecondary activeKey={activeTabKeySecondary} onSelect={this.handleTabClickSecondary}>
           <Tab eventKey={4} title={<><TabTitleIcon><UserIcon /></TabTitleIcon> <TabTitleText>Users</TabTitleText>  </>}>
@@ -220,11 +289,4 @@ class Management extends React.Component {
           </Tab>
           </Tabs>
         </Tab>
-      </Tabs>
-      </PageSection>
-      </React.Fragment>
-    );
-  }
-}
-
-export { Management };
+      </Tabs> */}

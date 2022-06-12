@@ -164,7 +164,7 @@ class Properties extends React.Component {
   }
 
 
-  render(): React.Component {
+  render(): React.Fragment {
     const {
       type,
       password,

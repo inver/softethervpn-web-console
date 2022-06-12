@@ -130,11 +130,11 @@ class HubsGalleryItems extends React.Component {
     };
 
     this.onManagementClick = () => {
-      window.location = window.location.toString() + "?mode=management&hub=" + this.state.selectedHub;
+      window.location = window.location.toString() + "/" + this.state.selectedHub + "/management";
     };
 
     this.onStatusClick = () => {
-      window.location = window.location.toString() + "?mode=status&hub=" + this.state.selectedHub;
+      window.location = window.location.toString() + "/" + this.state.selectedHub + "/status";
     };
   }
 
@@ -159,7 +159,7 @@ class HubsGalleryItems extends React.Component {
     this.loadHubs()
   }
 
-  render(): void {
+  render(): React.Fragment {
     const {
       hublist,
       toggle,

@@ -263,7 +263,7 @@ class SoftetherRouter extends React.Component {
       });
   } // componentDidMount
 
-  render() {
+  render(): React.Fragment {
     const { loadingAdmin, loadingCluster, loadigDDNSAzure, loadingCaps, loadingInfo } = this.state;
     const loading = loadingAdmin || loadingCluster || loadigDDNSAzure || loadingCaps || loadingInfo;
 

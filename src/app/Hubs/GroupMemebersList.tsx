@@ -69,7 +69,7 @@ class GroupMemberList extends React.Component {
     this.loadUsers();
   }
 
-  render(): React.Component {
+  render(){
     const {
       usersList,
       groupName,

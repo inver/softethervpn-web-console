@@ -14,7 +14,10 @@ import {
   PageSection,
   PageSectionVariants,
   Flex,
-  FlexItem
+  FlexItem,
+  Breadcrumb,
+  BreadcrumbItem,
+  Divider
 } from '@patternfly/react-core';
 import { api } from '@app/utils/vpnrpc_settings';
 import * as VPN from "vpnrpc/dist/vpnrpc";
@@ -103,12 +106,20 @@ class HubStatus extends React.Component {
     this.loadStatus()
   }
 
-  render(): React.Component {
-    const { loading, hubObject } = this.state;
+  render(): React.Fragment {
+    const { loading, hub, hubObject } = this.state;
     const formatted_hubObject = format_keys_and_values(hubObject);
 
     return (
       <React.Fragment>
+        <PageSection variant={PageSectionVariants.light}>
+        <Breadcrumb>
+          <BreadcrumbItem to="#/hubs">Hubs</BreadcrumbItem>
+          <BreadcrumbItem>{hub}</BreadcrumbItem>
+          <BreadcrumbItem to={"#/hubs/" + hub + "/status"} isActive>Status</BreadcrumbItem>
+        </Breadcrumb>
+      </PageSection>
+      <Divider component="div" />
       <PageSection variant={PageSectionVariants.light}>
       <Flex>
       <FlexItem>
