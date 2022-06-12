@@ -165,7 +165,7 @@ class GroupsList extends React.Component {
           const element = document.getElementById("editGroup");
           element.scrollIntoView();
         }, 1);
-        this.setState({ rows: rows, groupObject: new VPN.VpnRpcSetGroup(), isSelected: false, showEdit: false, showMemberList: false, showStats: false })
+        this.setState({ rows: rows, groupObject: new VPN.VpnRpcSetGroup({HubName_str: this.props.hub}), isSelected: false, showEdit: false, showMemberList: false, showStats: false })
       }
       this.setState({ showCreate: !this.state.showCreate })
     };
@@ -331,7 +331,7 @@ class GroupsList extends React.Component {
       {
         showEdit ?
         <StackItem>
-          <GroupSettings create={false} hub={hub} group={groupObject} updateGroups={this.updateGroups} onAlert={this.onAlert}/>
+          <GroupSettings create={false} group={groupObject} updateGroups={this.updateGroups} onAlert={this.onAlert}/>
         </StackItem>
         :
         ""
