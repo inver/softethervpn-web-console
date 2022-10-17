@@ -1,7 +1,7 @@
 From 9dc69169c499fc19fbcdda999eaf3018e8e53e70 Mon Sep 17 00:00:00 2001
 From: Luca Magrone <luca@magrone.cc>
 Date: Tue, 18 Oct 2022 00:32:39 +0200
-Subject: [PATCH] Make paths standard
+Subject: [PATCH 1/2] Make paths standard
 
 Change paths so that the program runs smoothly under systemd. Binaries
 should not write files in the working directory, but in a dedicated
@@ -251,6 +251,84 @@ diff --git a/src/makefiles/linux_64bit.mak b/src/makefiles/linux_64bit.mak
 index 02f67e98..767a59f6 100644
 --- a/src/makefiles/linux_64bit.mak
 +++ b/src/makefiles/linux_64bit.mak
+@@ -75,6 +75,7 @@ INSTALL_VPNSERVER_DIR=/usr/vpnserver/
+ INSTALL_VPNBRIDGE_DIR=/usr/vpnbridge/
+ INSTALL_VPNCLIENT_DIR=/usr/vpnclient/
+ INSTALL_VPNCMD_DIR=/usr/vpncmd/
++INSTALL_BUILDROOT=/
+ 
+ ifeq ($(DEBUG),YES)
+ 	OPTIONS_COMPILE=$(OPTIONS_COMPILE_DEBUG)
+@@ -429,36 +430,36 @@ install: $(INSTALL_BINDIR)vpnserver $(INSTALL_BINDIR)vpnbridge $(INSTALL_BINDIR)
+ 	@echo
+ 
+ $(INSTALL_BINDIR)vpnserver: bin/vpnserver/hamcore.se2 bin/vpnserver/vpnserver
+-	@mkdir -p $(INSTALL_VPNSERVER_DIR)
+-	cp bin/vpnserver/hamcore.se2 $(INSTALL_VPNSERVER_DIR)hamcore.se2
+-	cp bin/vpnserver/vpnserver $(INSTALL_VPNSERVER_DIR)vpnserver
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNSERVER_DIR)
++	cp bin/vpnserver/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNSERVER_DIR)hamcore.se2
++	cp bin/vpnserver/vpnserver $(INSTALL_BUILDROOT)$(INSTALL_VPNSERVER_DIR)vpnserver
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpnserver
+ 	echo $(INSTALL_VPNSERVER_DIR)vpnserver '"$$@"' >> $(INSTALL_BINDIR)vpnserver
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpnserver
+ 	chmod 755 $(INSTALL_BINDIR)vpnserver
+ 
+ $(INSTALL_BINDIR)vpnbridge: bin/vpnbridge/hamcore.se2 bin/vpnbridge/vpnbridge
+-	@mkdir -p $(INSTALL_VPNBRIDGE_DIR)
+-	cp bin/vpnbridge/hamcore.se2 $(INSTALL_VPNBRIDGE_DIR)hamcore.se2
+-	cp bin/vpnbridge/vpnbridge $(INSTALL_VPNBRIDGE_DIR)vpnbridge
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNBRIDGE_DIR)
++	cp bin/vpnbridge/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNBRIDGE_DIR)hamcore.se2
++	cp bin/vpnbridge/vpnbridge $(INSTALL_BUILDROOT)$(INSTALL_VPNBRIDGE_DIR)vpnbridge
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpnbridge
+ 	echo $(INSTALL_VPNBRIDGE_DIR)vpnbridge '"$$@"' >> $(INSTALL_BINDIR)vpnbridge
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpnbridge
+ 	chmod 755 $(INSTALL_BINDIR)vpnbridge
+ 
+ $(INSTALL_BINDIR)vpnclient: bin/vpnclient/hamcore.se2 bin/vpnclient/vpnclient
+-	@mkdir -p $(INSTALL_VPNCLIENT_DIR)
+-	cp bin/vpnclient/hamcore.se2 $(INSTALL_VPNCLIENT_DIR)hamcore.se2
+-	cp bin/vpnclient/vpnclient $(INSTALL_VPNCLIENT_DIR)vpnclient
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNCLIENT_DIR)
++	cp bin/vpnclient/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNCLIENT_DIR)hamcore.se2
++	cp bin/vpnclient/vpnclient $(INSTALL_BUILDROOT)$(INSTALL_VPNCLIENT_DIR)vpnclient
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpnclient
+ 	echo $(INSTALL_VPNCLIENT_DIR)vpnclient '"$$@"' >> $(INSTALL_BINDIR)vpnclient
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpnclient
+ 	chmod 755 $(INSTALL_BINDIR)vpnclient
+ 
+ $(INSTALL_BINDIR)vpncmd: bin/vpncmd/hamcore.se2 bin/vpncmd/vpncmd
+-	@mkdir -p $(INSTALL_VPNCMD_DIR)
+-	cp bin/vpncmd/hamcore.se2 $(INSTALL_VPNCMD_DIR)hamcore.se2
+-	cp bin/vpncmd/vpncmd $(INSTALL_VPNCMD_DIR)vpncmd
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNCMD_DIR)
++	cp bin/vpncmd/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNCMD_DIR)hamcore.se2
++	cp bin/vpncmd/vpncmd $(INSTALL_BUILDROOT)$(INSTALL_VPNCMD_DIR)vpncmd
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpncmd
+ 	echo $(INSTALL_VPNCMD_DIR)vpncmd '"$$@"' >> $(INSTALL_BINDIR)vpncmd
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpncmd
+-- 
+2.37.3
+
+
+From 5e970678fd8cd1ca6e6fbc6d2531cae8f4389b6d Mon Sep 17 00:00:00 2001
+From: Luca Magrone <luca@magrone.cc>
+Date: Tue, 18 Oct 2022 01:35:13 +0200
+Subject: [PATCH 2/2] Modify makefile needed by arm64 arch
+
+Build fails because when on aarch64 the configure script does not pick
+the patched makefile template so we need to patch it.
+
+Signed-off-by: Luca Magrone <luca@magorne.cc>
+---
+ src/makefiles/linux_64bit_nobits.mak | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/src/makefiles/linux_64bit_nobits.mak b/src/makefiles/linux_64bit_nobits.mak
+index 9a478248..351566c1 100644
+--- a/src/makefiles/linux_64bit_nobits.mak
++++ b/src/makefiles/linux_64bit_nobits.mak
 @@ -75,6 +75,7 @@ INSTALL_VPNSERVER_DIR=/usr/vpnserver/
  INSTALL_VPNBRIDGE_DIR=/usr/vpnbridge/
  INSTALL_VPNCLIENT_DIR=/usr/vpnclient/
