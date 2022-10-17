@@ -1,0 +1,313 @@
+From 9dc69169c499fc19fbcdda999eaf3018e8e53e70 Mon Sep 17 00:00:00 2001
+From: Luca Magrone <luca@magrone.cc>
+Date: Tue, 18 Oct 2022 00:32:39 +0200
+Subject: [PATCH] Make paths standard
+
+Change paths so that the program runs smoothly under systemd. Binaries
+should not write files in the working directory, but in a dedicated
+directory elsewhere.
+
+Signed-off-by: Luca Magrone <luca@magrone.cc>
+---
+ src/Cedar/Cedar.h             | 30 +++++++++++++++---------------
+ src/Cedar/Protocol.c          |  6 ++----
+ src/Cedar/Server.c            | 14 +++++++-------
+ src/Mayaqua/Cfg.h             |  2 +-
+ src/Mayaqua/Table.h           |  2 +-
+ src/Mayaqua/Unix.c            | 17 +++++------------
+ src/makefiles/linux_64bit.mak | 25 +++++++++++++------------
+ 7 files changed, 44 insertions(+), 52 deletions(-)
+
+diff --git a/src/Cedar/Cedar.h b/src/Cedar/Cedar.h
+index a95e3e1d..dcf68981 100644
+--- a/src/Cedar/Cedar.h
++++ b/src/Cedar/Cedar.h
+@@ -502,22 +502,22 @@
+ #define	LOG_ENGINE_BUFFER_CACHE_SIZE_MAX	(10 * 1024 * 1024)	// Write cache size
+ 
+ // Constant such as a file name
+-#define	SERVER_LOG_DIR_NAME			"@server_log"
++#define	SERVER_LOG_DIR_NAME			"/var/log/softethervpn/server_log"
+ #define	BRIDGE_LOG_DIR_NAME			SERVER_LOG_DIR_NAME
+ #define	SERVER_LOG_PERFIX			"vpn"
+ 
+-#define	HUB_SECURITY_LOG_DIR_NAME	"@security_log"
+-#define	HUB_SECURITY_LOG_FILE_NAME	"@security_log/%s"
++#define	HUB_SECURITY_LOG_DIR_NAME	"/var/log/softethervpn/security_log"
++#define	HUB_SECURITY_LOG_FILE_NAME	"/var/log/softethervpn/security_log/%s"
+ #define	HUB_SECURITY_LOG_PREFIX		"sec"
+-#define	HUB_PACKET_LOG_DIR_NAME		"@packet_log"
+-#define	HUB_PACKET_LOG_FILE_NAME	"@packet_log/%s"
++#define	HUB_PACKET_LOG_DIR_NAME		"/var/log/softethervpn/packet_log"
++#define	HUB_PACKET_LOG_FILE_NAME	"/var/log/softethervpn/packet_log/%s"
+ #define	HUB_PACKET_LOG_PREFIX		"pkt"
+ 
+-#define	NAT_LOG_DIR_NAME			"@secure_nat_log"
+-#define	NAT_LOG_FILE_NAME			"@secure_nat_log/%s"
++#define	NAT_LOG_DIR_NAME			"/var/log/softethervpn/secure_nat_log"
++#define	NAT_LOG_FILE_NAME			"/var/log/softethervpn/secure_nat_log/%s"
+ #define	NAT_LOG_PREFIX				"snat"
+ 
+-#define	CLIENT_LOG_DIR_NAME			"@client_log"
++#define	CLIENT_LOG_DIR_NAME			"/var/log/softethervpn/client_log"
+ #define	CLIENT_LOG_PREFIX			"client"
+ 
+ // Packet log settings
+@@ -552,8 +552,8 @@
+ #define	DISK_FREE_CHECK_INTERVAL_DEFAULT	(5 * 60 * 1000)
+ 
+ // Simple log
+-#define TINY_LOG_DIRNAME			"@tiny_log"
+-#define TINY_LOG_FILENAME			"@tiny_log/%04u%02u%02u_%02u%02u%02u.log"
++#define TINY_LOG_DIRNAME			"/var/log/softethervpn/tiny_log"
++#define TINY_LOG_FILENAME			"/var/log/softethervpn/tiny_log/%04u%02u%02u_%02u%02u%02u.log"
+ 
+ 
+ //////////////////////////////////////////////////////////////////////
+@@ -566,7 +566,7 @@
+ //#define CE_SNAPSHOT_INTERVAL		((UINT64)(3000))
+ #define CE_SNAPSHOT_POLLING_INTERVAL	(1 * 1000)
+ #define CE_SNAPSHOT_POLLING_INTERVAL_LICENSE	(30 * 1000)
+-#define CE_SNAPSHOT_DIR_NAME		"@carrier_log"
++#define CE_SNAPSHOT_DIR_NAME		"/var/log/softethervpn/carrier_log"
+ #define CE_SNAPSHOT_PREFIX			"carrier"
+ 
+ 
+@@ -583,7 +583,7 @@
+ // Expiration date of random size cache
+ #define	RAND_SIZE_CACHE_EXPIRE		(24 * 60 * 60 * 1000)
+ // Management allowed IP address list file name
+-#define	ADMINIP_TXT					"@adminip.txt"
++#define	ADMINIP_TXT					"/var/log/softethervpn/adminip.txt"
+ 
+ #define NON_SSL_MIN_COUNT			60
+ #define NON_SSL_ENTRY_EXPIRES		(10 * 60 * 1000)
+@@ -634,9 +634,9 @@
+ //////////////////////////////////////////////////////////////////////
+ 
+ #define	EL_ADMIN_PORT			22888
+-#define	EL_CONFIG_FILENAME		"@etherlogger.config"
+-#define	EL_PACKET_LOG_DIR_NAME	"@etherlogger_log"
+-#define	EL_PACKET_LOG_FILE_NAME	"@etherlogger_log/%s"
++#define	EL_CONFIG_FILENAME		"/etc/softethervpn/etherlogger.config"
++#define	EL_PACKET_LOG_DIR_NAME	"/var/log/softethervpn/etherlogger_log"
++#define	EL_PACKET_LOG_FILE_NAME	"/var/log/softethervpn/etherlogger_log/%s"
+ #define	EL_PACKET_LOG_PREFIX	"pkt"
+ #define	EL_LICENSE_CHECK_SPAN	(10 * 1000)
+ 
+diff --git a/src/Cedar/Protocol.c b/src/Cedar/Protocol.c
+index 0e77d29d..9cd96ae4 100644
+--- a/src/Cedar/Protocol.c
++++ b/src/Cedar/Protocol.c
+@@ -872,11 +872,9 @@ bool TryGetRootCertChain(LIST *o, X *x, bool auto_save, X **found_root_x)
+ 		UINT i;
+ 		DIRLIST *dir;
+ 		wchar_t dirname[MAX_SIZE];
+-		wchar_t exedir[MAX_SIZE];
+ 
+-		GetExeDirW(exedir, sizeof(exedir));
+-		CombinePathW(dirname, sizeof(dirname), exedir, L"chain_certs");
+-		MakeDirExW(dirname);
++        StrCpy(dirname, sizeof(dirname), "/var/lib/softethervpn/chain_certs");
++		MakeDirEx(dirname);
+ 
+ 		if (auto_save)
+ 		{
+diff --git a/src/Cedar/Server.c b/src/Cedar/Server.c
+index 545d1313..2739fddd 100644
+--- a/src/Cedar/Server.c
++++ b/src/Cedar/Server.c
+@@ -106,12 +106,12 @@
+ 
+ static SERVER *server = NULL;
+ static LOCK *server_lock = NULL;
+-char *SERVER_CONFIG_FILE_NAME = "@vpn_server.config";
+-char *SERVER_CONFIG_FILE_NAME_IN_CLIENT = "@vpn_gate_svc.config";
+-char *SERVER_CONFIG_FILE_NAME_IN_CLIENT_RELAY = "@vpn_gate_relay.config";
+-char *BRIDGE_CONFIG_FILE_NAME = "@vpn_bridge.config";
+-char *SERVER_CONFIG_TEMPLATE_NAME = "@vpn_server_template.config";
+-char *BRIDGE_CONFIG_TEMPLATE_NAME = "@vpn_server_template.config";
++char *SERVER_CONFIG_FILE_NAME = "/etc/softethervpn/vpn_server.config";
++char *SERVER_CONFIG_FILE_NAME_IN_CLIENT = "/etc/softethervpn/vpn_gate_svc.config";
++char *SERVER_CONFIG_FILE_NAME_IN_CLIENT_RELAY = "/etc/softethervpn/vpn_gate_relay.config";
++char *BRIDGE_CONFIG_FILE_NAME = "/etc/softethervpn/vpn_bridge.config";
++char *SERVER_CONFIG_TEMPLATE_NAME = "/etc/softethervpn/vpn_server_template.config";
++char *BRIDGE_CONFIG_TEMPLATE_NAME = "/etc/softethervpn/vpn_server_template.config";
+ 
+ static bool server_reset_setting = false;
+ 
+@@ -10995,7 +10995,7 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
+ #endif	// OS_WIN32
+ 
+ #ifdef	ENABLE_AZURE_SERVER
+-	if (IsFileExists("@azureserver.config"))
++	if (IsFileExists("/etc/softethervpn/azureserver.config"))
+ 	{
+ 		DisableRDUPServerGlobally();
+ 		s->AzureServer = NewAzureServer(s->Cedar);
+diff --git a/src/Mayaqua/Cfg.h b/src/Mayaqua/Cfg.h
+index c9bf648f..6028f9cc 100644
+--- a/src/Mayaqua/Cfg.h
++++ b/src/Mayaqua/Cfg.h
+@@ -108,7 +108,7 @@
+ // Macro
+ //#define	CHECK_CFG_NAME_EXISTS			// Check duplication of the existing name
+ 
+-#define	SAVE_BINARY_FILE_NAME_SWITCH	L"@save_binary"
++#define	SAVE_BINARY_FILE_NAME_SWITCH	L"/var/lib/softethervpn/save_binary"
+ 
+ // Constants
+ #define	TAG_DECLARE			"declare"
+diff --git a/src/Mayaqua/Table.h b/src/Mayaqua/Table.h
+index fc3dfdf8..6f094578 100644
+--- a/src/Mayaqua/Table.h
++++ b/src/Mayaqua/Table.h
+@@ -110,7 +110,7 @@
+ #define	LANGLIST_FILENAME		"|languages.txt"
+ #define	LANGLIST_FILENAME_WINE	"|languages_wine.txt"
+ 
+-#define	LANG_CONFIG_FILENAME	L"@lang.config"
++#define	LANG_CONFIG_FILENAME	L"/etc/softethervpn/lang.config"
+ #define	LANG_CONFIG_TEMPLETE	"|lang.config"
+ 
+ // Language constant
+diff --git a/src/Mayaqua/Unix.c b/src/Mayaqua/Unix.c
+index ff84d35d..6d241ea4 100644
+--- a/src/Mayaqua/Unix.c
++++ b/src/Mayaqua/Unix.c
+@@ -900,7 +900,6 @@ void *UnixNewSingleInstance(char *instance_name)
+ 	UNIXLOCKFILE *ret;
+ 	char tmp[MAX_SIZE];
+ 	char name[MAX_SIZE];
+-	char dir[MAX_PATH];
+ 	int fd;
+ 	struct flock lock;
+ 	int mode = S_IRUSR | S_IWUSR;
+@@ -915,10 +914,8 @@ void *UnixNewSingleInstance(char *instance_name)
+ 		StrCpy(tmp, sizeof(tmp), instance_name);
+ 	}
+ 
+-	GetExeDir(dir, sizeof(dir));
+-
+ 	// File name generation
+-	Format(name, sizeof(name), "%s/.%s", dir, tmp);
++	Format(name, sizeof(name), "/run/softethervpn/.%s", tmp);
+ 
+ 	fd = open(name, O_WRONLY);
+ 	if (fd == -1)
+@@ -2359,23 +2356,22 @@ void UnixGenPidFileName(char *name, UINT size)
+ 	char exe_name[MAX_PATH];
+ 	UCHAR hash[MD5_SIZE];
+ 	char tmp1[64];
+-	char dir[MAX_PATH];
++    
+ 	// Validate arguments
+ 	if (name == NULL)
+ 	{
+ 		return;
+ 	}
+ 
+-	GetExeDir(dir, sizeof(dir));
+-
+ 	GetExeName(exe_name, sizeof(exe_name));
++    
+ 	StrCat(exe_name, sizeof(exe_name), ":pid_hash");
+ 	StrUpper(exe_name);
+ 
+ 	Hash(hash, exe_name, StrLen(exe_name), false);
+ 	BinToStr(tmp1, sizeof(tmp1), hash, sizeof(hash));
+ 
+-	Format(name, size, "%s/.pid_%s", dir, tmp1);
++	Format(name, size, "/run/softethervpn/.pid_%s", tmp1);
+ }
+ 
+ // Delete the PID file
+@@ -2404,15 +2400,12 @@ void UnixGenCtlFileName(char *name, UINT size)
+ 	char exe_name[MAX_PATH];
+ 	UCHAR hash[MD5_SIZE];
+ 	char tmp1[64];
+-	char dir[MAX_PATH];
+ 	// Validate arguments
+ 	if (name == NULL)
+ 	{
+ 		return;
+ 	}
+ 
+-	GetExeDir(dir, sizeof(dir));
+-
+ 	GetExeName(exe_name, sizeof(exe_name));
+ 	StrCat(exe_name, sizeof(exe_name), ":pid_hash");
+ 	StrUpper(exe_name);
+@@ -2420,7 +2413,7 @@ void UnixGenCtlFileName(char *name, UINT size)
+ 	Hash(hash, exe_name, StrLen(exe_name), false);
+ 	BinToStr(tmp1, sizeof(tmp1), hash, sizeof(hash));
+ 
+-	Format(name, size, "%s/.ctl_%s", dir, tmp1);
++	Format(name, size, "/run/softethervpn/.ctl_%s", tmp1);
+ }
+ 
+ // Write the CTL file
+diff --git a/src/makefiles/linux_64bit.mak b/src/makefiles/linux_64bit.mak
+index 02f67e98..767a59f6 100644
+--- a/src/makefiles/linux_64bit.mak
++++ b/src/makefiles/linux_64bit.mak
+@@ -75,6 +75,7 @@ INSTALL_VPNSERVER_DIR=/usr/vpnserver/
+ INSTALL_VPNBRIDGE_DIR=/usr/vpnbridge/
+ INSTALL_VPNCLIENT_DIR=/usr/vpnclient/
+ INSTALL_VPNCMD_DIR=/usr/vpncmd/
++INSTALL_BUILDROOT=/
+ 
+ ifeq ($(DEBUG),YES)
+ 	OPTIONS_COMPILE=$(OPTIONS_COMPILE_DEBUG)
+@@ -429,36 +430,36 @@ install: $(INSTALL_BINDIR)vpnserver $(INSTALL_BINDIR)vpnbridge $(INSTALL_BINDIR)
+ 	@echo
+ 
+ $(INSTALL_BINDIR)vpnserver: bin/vpnserver/hamcore.se2 bin/vpnserver/vpnserver
+-	@mkdir -p $(INSTALL_VPNSERVER_DIR)
+-	cp bin/vpnserver/hamcore.se2 $(INSTALL_VPNSERVER_DIR)hamcore.se2
+-	cp bin/vpnserver/vpnserver $(INSTALL_VPNSERVER_DIR)vpnserver
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNSERVER_DIR)
++	cp bin/vpnserver/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNSERVER_DIR)hamcore.se2
++	cp bin/vpnserver/vpnserver $(INSTALL_BUILDROOT)$(INSTALL_VPNSERVER_DIR)vpnserver
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpnserver
+ 	echo $(INSTALL_VPNSERVER_DIR)vpnserver '"$$@"' >> $(INSTALL_BINDIR)vpnserver
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpnserver
+ 	chmod 755 $(INSTALL_BINDIR)vpnserver
+ 
+ $(INSTALL_BINDIR)vpnbridge: bin/vpnbridge/hamcore.se2 bin/vpnbridge/vpnbridge
+-	@mkdir -p $(INSTALL_VPNBRIDGE_DIR)
+-	cp bin/vpnbridge/hamcore.se2 $(INSTALL_VPNBRIDGE_DIR)hamcore.se2
+-	cp bin/vpnbridge/vpnbridge $(INSTALL_VPNBRIDGE_DIR)vpnbridge
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNBRIDGE_DIR)
++	cp bin/vpnbridge/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNBRIDGE_DIR)hamcore.se2
++	cp bin/vpnbridge/vpnbridge $(INSTALL_BUILDROOT)$(INSTALL_VPNBRIDGE_DIR)vpnbridge
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpnbridge
+ 	echo $(INSTALL_VPNBRIDGE_DIR)vpnbridge '"$$@"' >> $(INSTALL_BINDIR)vpnbridge
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpnbridge
+ 	chmod 755 $(INSTALL_BINDIR)vpnbridge
+ 
+ $(INSTALL_BINDIR)vpnclient: bin/vpnclient/hamcore.se2 bin/vpnclient/vpnclient
+-	@mkdir -p $(INSTALL_VPNCLIENT_DIR)
+-	cp bin/vpnclient/hamcore.se2 $(INSTALL_VPNCLIENT_DIR)hamcore.se2
+-	cp bin/vpnclient/vpnclient $(INSTALL_VPNCLIENT_DIR)vpnclient
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNCLIENT_DIR)
++	cp bin/vpnclient/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNCLIENT_DIR)hamcore.se2
++	cp bin/vpnclient/vpnclient $(INSTALL_BUILDROOT)$(INSTALL_VPNCLIENT_DIR)vpnclient
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpnclient
+ 	echo $(INSTALL_VPNCLIENT_DIR)vpnclient '"$$@"' >> $(INSTALL_BINDIR)vpnclient
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpnclient
+ 	chmod 755 $(INSTALL_BINDIR)vpnclient
+ 
+ $(INSTALL_BINDIR)vpncmd: bin/vpncmd/hamcore.se2 bin/vpncmd/vpncmd
+-	@mkdir -p $(INSTALL_VPNCMD_DIR)
+-	cp bin/vpncmd/hamcore.se2 $(INSTALL_VPNCMD_DIR)hamcore.se2
+-	cp bin/vpncmd/vpncmd $(INSTALL_VPNCMD_DIR)vpncmd
++	@mkdir -p $(INSTALL_BUILDROOT)$(INSTALL_VPNCMD_DIR)
++	cp bin/vpncmd/hamcore.se2 $(INSTALL_BUILDROOT)$(INSTALL_VPNCMD_DIR)hamcore.se2
++	cp bin/vpncmd/vpncmd $(INSTALL_BUILDROOT)$(INSTALL_VPNCMD_DIR)vpncmd
+ 	echo "#!/bin/sh" > $(INSTALL_BINDIR)vpncmd
+ 	echo $(INSTALL_VPNCMD_DIR)vpncmd '"$$@"' >> $(INSTALL_BINDIR)vpncmd
+ 	echo 'exit $$?' >> $(INSTALL_BINDIR)vpncmd
+-- 
+2.37.3
+
