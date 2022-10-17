@@ -62,7 +62,7 @@ Source0:        {{{ git_dir_pack }}}
 Source1:        https://github.com/SoftEtherVPN/SoftEtherVPN/archive/refs/tags/%{V5_VERSION}.tar.gz
 Source2:        https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/archive/refs/tags/v%{V4_VERSION}.tar.gz
 
-Patch0:         softethervpn-cflags.patch
+Patch0:         softethervpn-flags.patch
 Patch1:         softethervpn-paths.patch
 
 %description
