@@ -259,6 +259,11 @@ mkdir SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 cp -r dist/* SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 %endif
 pushd SoftEtherVPN_Stable-%{V4_VERSION}
+    # Allow compiler to create build build objects
+    # For some reason it's a problem only affecting aarch64 on rawhide
+    %ifarch aarch64 && 0%{?fedora} >= 38
+    export CFLAGS=$( echo "%{optflags}" | sed 's/-pipe//' )
+    %endif
     %configure
     %make_build -e
 popd
