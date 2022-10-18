@@ -1,9 +1,9 @@
 {
-  "name": "softether-patternfly-ui",
+  "name": "softethervpn-web-console",
   "version": "0.0.1",
   "description": "A SoftEther VPN Server web management application.",
-  "repository": "https://github.com/Leuca/softether-patternfly-ui.git",
-  "homepage": "https://github.com/Leuca/softether-patternfly-ui",
+  "repository": "https://github.com/Leuca/softethervpn-web-console.git",
+  "homepage": "https://github.com/Leuca/softethervpn-web-console",
   "license": "MIT",
   "private": true,
   "scripts": {
