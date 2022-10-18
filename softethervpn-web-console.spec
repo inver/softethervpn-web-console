@@ -22,6 +22,9 @@
 # For development purposes one might want to skip building the console itself
 %bcond_without console
 
+# Optionally skip changing the binary scripts
+%bcond_without systemd_aliases
+
 # It is reasonable to pick stable or unstable version and not build both
 # Build by default version 5 if the arch is incompatible
 %ifarch %{nv4_arches}
@@ -371,6 +374,12 @@ pushd SoftEtherVPN_Stable-%{V4_VERSION}
     sed -i 's/opt\/vpnclient/usr\/libexec\/softethervpn\/vpnclient/' systemd/softether-vpnclient.service
     sed -i 's/Restart=on-failure/Restart=on-failure\nLogsDirectory=softerhervpn\nRuntimeDirectory=softethervpn/' systemd/softether-vpnclient.service
 
+    %if %{with systemd_aliases}
+    # Make the binary scripts use systemctl
+    sed -i '2s/.*/\/usr\/bin\/systemctl "$@" softethervpn-server/' %{buildroot}%{_bindir}/vpnserver
+    sed -i '2s/.*/\/usr\/bin\/systemctl "$@" softethervpn-bridge/' %{buildroot}%{_bindir}/vpnbridge
+    sed -i '2s/.*/\/usr\/bin\/systemctl "$@" softethervpn-client/' %{buildroot}%{_bindir}/vpnclient
+    %endif
 popd
 
 # Install systemd units
