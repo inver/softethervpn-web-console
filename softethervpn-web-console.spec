@@ -88,10 +88,11 @@ URL:            https://github.com/SoftEtherVPN/SoftEtherVPN
 
 %if %{without v5}
 ExcludeArch:    %{nv4_arches}
+%else
+Requires:       softethervpn-libs%{_isa} = %{actual_version}-%{release}
 %endif
 
 Version:        %{actual_version}
-Requires:       softethervpn-libs%{_isa} = %{actual_version}-%{release}
 
 %description -n softethervpn-common
 SoftEther VPN is one of the world's most powerful and easy-to-use multi-protocol VPN software. It runs on Windows, Linux, Mac, FreeBSD, and Solaris.
