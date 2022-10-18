@@ -3,7 +3,7 @@ From: Luca Magrone <luca@magrone.cc>
 Date: Tue, 18 Oct 2022 05:21:19 +0200
 Subject: [PATCH] Make the library shared
 
-Make cpu_features shared with soversion 0.1.0 (26133d3)
+Make cpu_features shared with soversion 0.6.0 (26133d3)
 
 Signed-off-by: Luca Magrone <luca@magrone.cc>
 ---
@@ -15,23 +15,23 @@ index 591c116..c69ba4d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -14,7 +14,7 @@ endif(NOT CMAKE_BUILD_TYPE)
- option(BUILD_TESTING "Enable test (depends on googletest)." OFF)
- # BUILD_SHARED_LIBS is a standard CMake variable, but we declare it here to make
- # it prominent in the GUI.
+ # cpu_features uses bit-fields which are - to some extends - implementation-defined (see https://en.cppreference.com/w/c/language/bit_field).
+ # As a consequence it is discouraged to use cpu_features as a shared library because different compilers may interpret the code in different ways.
+ # Prefer static linking from source whenever possible.
 -option(BUILD_SHARED_LIBS "Build library as shared." OFF)
 +option(BUILD_SHARED_LIBS "Build library as shared." ON)
+ # PIC
+ option(BUILD_PIC "Build with Position Independant Code." OFF) # Default is off at least for GCC
  
- #
- # library : cpu_features
-@@ -60,7 +60,7 @@ target_include_directories(cpu_features
-   PRIVATE
-   include/internal
- )
--set_target_properties(cpu_features PROPERTIES PUBLIC_HEADER "${_HDRS}")
-+set_target_properties(cpu_features PROPERTIES PUBLIC_HEADER "${_HDRS}" SOVERSION 0.1.0)
- target_compile_definitions(cpu_features
-   PUBLIC STACK_LINE_READER_BUFFER_SIZE=1024)
+@@ -63,7 +63,7 @@ target_include_directories(cpu_features
+   list(APPEND CPU_FEATURES_SRCS $<TARGET_OBJECTS:unix_based_hardware_detection>)
+ endif()
+ add_library(cpu_features ${CPU_FEATURES_HDRS} ${CPU_FEATURES_SRCS})
+-set_target_properties(cpu_features PROPERTIES PUBLIC_HEADER "${CPU_FEATURES_HDRS}")
++set_target_properties(cpu_features PROPERTIES PUBLIC_HEADER "${CPU_FEATURES_HDRS}" SOVERSION 0.6.0)
+ setup_include_and_definitions(cpu_features)
  target_link_libraries(cpu_features PUBLIC ${CMAKE_DL_LIBS})
+ target_include_directories(cpu_features
 -- 
 2.37.3
 

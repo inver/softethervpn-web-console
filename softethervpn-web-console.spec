@@ -6,13 +6,13 @@
 %global build5 %(echo "%{V5_VERSION}" | cut -d"." -f 3)
 %global build4 %(echo "%{V4_VERSION}" | cut -d"-" -f 2)
 
-%global cpu_feature_commit 26133d3b620c2c27f31d571efd27371100f891e9
-%global cpu_feature_version 0.1.0
+%global cpu_feature_commit a8397ba4591237c17d18e4acc091f5f3ebe7391e
+%global cpu_feature_version 0.6.0
 
 %global major %( echo "%{actual_version}" | cut -d"." -f 1 )
 
 %global console_path src/bin/hamcore/wwwroot/admin/manager
-%global ncpu_features aarch64 %{arm} s390x 
+%global ncpu_features s390x 
 %global nv4_arches s390x ppc64le 
 
 # For development purposes one might want to skip building the console itself
@@ -21,9 +21,9 @@
 # It is reasonable to pick stable or unstable version and not build both
 # Build by default version 5 if the arch is incompatible
 %ifarch %{nv4_arches}
-%bcond_with v5
-%else
 %bcond_without v5
+%else
+%bcond_with v5
 %endif
 
 %if %{with v5}
@@ -38,7 +38,7 @@
 ### Main package aka console
 Name:           {{{ git_dir_name }}}
 Version:        {{{ git_dir_version }}}
-Release:        3.build%{sebuild}%{?dist}
+Release:        4.build%{sebuild}%{?dist}
 
 Summary:        A work-in-progress PatternFly 4 web administration console for SoftEtherVPN Software
 License:        BSD-3
@@ -403,12 +403,7 @@ cp -r dist/* %{buildroot}%{_sharedstatedir}/%{name}/
 %files -n cpu_features-devel
 %license SoftEtherVPN-%{V5_VERSION}/src/Mayaqua/3rdparty/cpu_features/LICENSE
 %{_libdir}/libcpu_features.so
-%{_includedir}/cpu_features/cpuinfo_aarch64.h
-%{_includedir}/cpu_features/cpuinfo_arm.h
-%{_includedir}/cpu_features/cpuinfo_mips.h
-%{_includedir}/cpu_features/cpuinfo_ppc.h
-%{_includedir}/cpu_features/cpuinfo_x86.h
-%{_includedir}/cpu_features/cpu_features_macros.h
+%{_includedir}/cpu_features/*
 %{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets.cmake
 %{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets-relwithdebinfo.cmake
 #%%{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets-debug.cmake
