@@ -1,8 +1,3 @@
-# It is reasonable to pick stable or unstable version and not build both
-# Also for development purposes one might want to skip building the console itself
-%bcond_with v5
-%bcond_without console
-
 %global V5_VERSION 5.02.5180
 %global V4_VERSION 4.39-9772-beta
 
@@ -10,6 +5,26 @@
 %global ver4 %(echo "%{V4_VERSION}" | cut -d"-" -f 1)
 %global build5 %(echo "%{V5_VERSION}" | cut -d"." -f 3)
 %global build4 %(echo "%{V4_VERSION}" | cut -d"-" -f 2)
+
+%global cpu_feature_commit 26133d3b620c2c27f31d571efd27371100f891e9
+%global cpu_feature_version 0.1.0
+
+%global major %( echo "%{actual_version}" | cut -d"." -f 1 )
+
+%global console_path src/bin/hamcore/wwwroot/admin/manager
+%global ncpu_features aarch64 %{arm} s390x 
+%global nv4_arches s390x ppc64le 
+
+# For development purposes one might want to skip building the console itself
+%bcond_without console
+
+# It is reasonable to pick stable or unstable version and not build both
+# Build by default version 5 if the arch is incompatible
+%ifarch %{nv4_arches}
+%bcond_with v5
+%else
+%bcond_without v5
+%endif
 
 %if %{with v5}
 %global actual_version %{ver5}
@@ -19,21 +34,16 @@
 %global sebuild %{build4}
 %endif
 
-%global major %( echo "%{actual_version}" | cut -d"." -f 1 )
-
-%global console_path src/bin/hamcore/wwwroot/admin/manager
-%global ncpu_features aarch64 %{arm} s390x 
-%global nv4_arches s390x ppc64le 
 
 ### Main package aka console
 Name:           {{{ git_dir_name }}}
 Version:        {{{ git_dir_version }}}
-Release:        2.build%{sebuild}%{?dist}
+Release:        3.build%{sebuild}%{?dist}
 
 Summary:        A work-in-progress PatternFly 4 web administration console for SoftEtherVPN Software
 License:        BSD-3
 
-URL:            https://github.com/Leuca/softether-patternfly-ui
+URL:            https://github.com/Leuca/softethervpn-web-console
 
 # Detailed information about the source Git repository and the source commit
 # for the created rpm package
@@ -64,6 +74,8 @@ Source2:        https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/archive/refs
 
 Patch0:         softethervpn-flags.patch
 Patch1:         softethervpn-paths.patch
+Patch2:         softethervpn-add-soversion.patch
+Patch3:         libcpu_features-shared-lib.patch
 
 %description
 SoftEtherVPN Patternfly web console aims to allow for easy and complete management of a SoftEtherVPN software instance directly connecting to its built-in web server.
@@ -79,6 +91,7 @@ ExcludeArch:    %{nv4_arches}
 %endif
 
 Version:        %{actual_version}
+Requires:       softethervpn-libs%{_isa} = %{actual_version}-%{release}
 
 %description -n softethervpn-common
 SoftEther VPN is one of the world's most powerful and easy-to-use multi-protocol VPN software. It runs on Windows, Linux, Mac, FreeBSD, and Solaris.
@@ -87,7 +100,7 @@ This package contains common files for software version %{major}
 %package -n softethervpn-server
 Summary:        An Open-Source Free Cross-platform Multi-protocol VPN Program
 License:        Apache License Version 2.0
-Requires:       softethervpn-common%{_isa} = %{version}-%{release}
+Requires:       softethervpn-common%{_isa} = %{actual_version}-%{release} 
 URL:            https://github.com/SoftEtherVPN/SoftEtherVPN
 
 %if %{without v5}
@@ -104,7 +117,7 @@ This package contains version %{major} server files and binary.
 %package -n softethervpn-client
 Summary:        An Open-Source Free Cross-platform Multi-protocol VPN Program
 License:        Apache License Version 2.0
-Requires:       softethervpn-common%{_isa} = %{version}-%{release}
+Requires:       softethervpn-common%{_isa} = %{actual_version}-%{release}
 URL:            https://github.com/SoftEtherVPN/SoftEtherVPN
 
 %if %{without v5}
@@ -121,7 +134,7 @@ This package contains version %{major} client files and binary.
 %package -n softethervpn-bridge
 Summary:        An Open-Source Free Cross-platform Multi-protocol VPN Program
 License:        Apache License Version 2.0
-Requires:       softethervpn-common%{_isa} = %{version}-%{release}
+Requires:       softethervpn-common%{_isa} = %{actual_version}-%{release}
 URL:            https://github.com/SoftEtherVPN/SoftEtherVPN
 
 %if %{without v5}
@@ -135,14 +148,73 @@ SoftEther VPN ("SoftEther" means "Software Ethernet") is one of the
 world's most powerful and easy-to-use multi-protocol VPN software.
 This package contains version %{major} bridge files and binary.
 
+%if %{with v5}
+%package -n softethervpn-libs
+Summary:        SoftEtherVPN shared libraries
+License:        Apache License Version 2.0
+URL:            https://github.com/SoftEtherVPN/SoftEtherVPN
+
+Version:        %{actual_version}
+
+%ifnarch %{ncpu_features}
+Requires:       cpu_features%{_isa} = %{cpu_feature_version}-%{release}
+%endif
+
+%description -n softethervpn-libs
+Package that provides shared libraries needed by SoftEtherVPN software
+
+%package -n softethervpn-devel
+Summary:        SoftEtherVPN shared libraries development headers
+License:        Apache License Version 2.0
+URL:            https://github.com/SoftEtherVPN/SoftEtherVPN
+
+Version:        %{actual_version}
+
+Requires:       softethervpn-libs%{_isa} = %{actual_version}-%{release}
+
+%description -n softethervpn-devel
+Development headers of the shared libraries used by SoftEtherVPN
+
+%ifnarch %{ncpu_features}
+%package -n cpu_features
+Summary:        A cross platform C99 library to get cpu features at runtime.
+License:        Apache License Version 2.0
+URL:            https://github.com/google/cpu_features
+
+Version:        %{cpu_feature_version}
+
+Provides:       cpu-features
+
+%description -n cpu_features
+A cross-platform C library to retrieve CPU features (such as available instructions) at runtime.
+
+%package -n cpu_features-devel
+Summary:        Development headers for cpu_features
+License:        Apache License Version 2.0
+URL:            https://github.com/google/cpu_features
+
+Version:        %{cpu_feature_version}
+
+Provides:       cpu-features-devel
+
+Requires:       cpu_features%{_isa} = %{cpu_feature_version}-%{release}
+
+%description -n cpu_features-devel
+Development headers for a cross-platform C library to retrieve CPU features (such as available instructions) at runtime.
+
+%endif
+
+%endif
 
 %prep
 %if %{with v5}
 {{{ git_dir_setup_macro }}} -a 1
 pushd SoftEtherVPN-%{V5_VERSION}
+    %{__patch} -p1 < %PATCH2
     git clone https://github.com/google/cpu_features.git src/Mayaqua/3rdparty/cpu_features
     pushd src/Mayaqua/3rdparty/cpu_features
-        git checkout 26133d3b620c2c27f31d571efd27371100f891e9
+        git checkout %{cpu_feature_commit}
+        %{__patch} -p1 < %PATCH3
     popd
     git clone https://github.com/cxong/tinydir.git 3rdparty/tinydir
     git clone https://github.com/BLAKE2/BLAKE2.git 3rdparty/BLAKE2
@@ -174,7 +246,7 @@ cp -r dist/* SoftEtherVPN-%{V5_VERSION}/%{console_path}
 %endif
 
 pushd SoftEtherVPN-%{V5_VERSION}
-    export CMAKE_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=%{_unitdir} -DSE_PIDDIR=%{_rundir}/softethervpn -DSE_LOGDIR=%{_localstatedir}/log/softethervpn -DSE_DBDIR=%{_sysconfdir}/softethervpn"
+    export CMAKE_FLAGS="-DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSTEMD_UNITDIR=%{_unitdir} -DSE_PIDDIR=%{_rundir}/softethervpn -DSE_LOGDIR=%{_localstatedir}/log/softethervpn -DSE_DBDIR=%{_sysconfdir}/softethervpn"
     %configure
     %make_build -C build
 popd
@@ -190,7 +262,7 @@ pushd SoftEtherVPN_Stable-%{V4_VERSION}
     # Remove -pipe flag because the compiler needs to create temporary files
     export CFLAGS=$( echo $CFLAGS | sed 's/-pipe //' )
     %configure
-    %make_build DEBUG=YES
+    %make_build
 popd
 
 %endif
@@ -228,6 +300,13 @@ pushd SoftEtherVPN-%{V5_VERSION}
 
     # Rename libexec folders
     mv %{buildroot}%{_libexecdir}/softether %{buildroot}%{_libexecdir}/softethervpn
+
+    # Copy headers
+    mkdir -p %{buildroot}%{_includedir}/libcedar
+    mkdir -p %{buildroot}%{_includedir}/libmayaqua
+    install -m 0644 src/Cedar/*.h %{buildroot}%{_includedir}/libcedar
+    install -m 0644 src/Mayaqua/*.h %{buildroot}%{_includedir}/libmayaqua
+
 popd
 
 # With V4
@@ -301,21 +380,38 @@ cp -r dist/* %{buildroot}%{_sharedstatedir}/%{name}/
 %{_rundir}/softethervpn
 %if %{with v5}
 %license SoftEtherVPN-%{V5_VERSION}/LICENSE
+
+%files -n softethervpn-libs
+%{_libdir}/libcedar.so.*
+%{_libdir}/libmayaqua.so.*
+%license SoftEtherVPN-%{V5_VERSION}/LICENSE
+
+%files -n softethervpn-devel
 %{_libdir}/libcedar.so
 %{_libdir}/libmayaqua.so
-# in case the build uses cpu_features
+%{_includedir}/libmayaqua/*.h
+%{_includedir}/libcedar/*.h
+%license SoftEtherVPN-%{V5_VERSION}/LICENSE
+
+# If supported by the arch
 %ifnarch %{ncpu_features}
-%{_libdir}/libcpu_features.a
+%files -n cpu_features
+%license SoftEtherVPN-%{V5_VERSION}/src/Mayaqua/3rdparty/cpu_features/LICENSE
+%{_libdir}/libcpu_features.so.*
+%{_bindir}/list_cpu_features
+
+%files -n cpu_features-devel
+%license SoftEtherVPN-%{V5_VERSION}/src/Mayaqua/3rdparty/cpu_features/LICENSE
+%{_libdir}/libcpu_features.so
 %{_includedir}/cpu_features/cpuinfo_aarch64.h
 %{_includedir}/cpu_features/cpuinfo_arm.h
 %{_includedir}/cpu_features/cpuinfo_mips.h
 %{_includedir}/cpu_features/cpuinfo_ppc.h
 %{_includedir}/cpu_features/cpuinfo_x86.h
 %{_includedir}/cpu_features/cpu_features_macros.h
-%{_bindir}/list_cpu_features
 %{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets.cmake
-#%%{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets-relwithdebinfo.cmake
-%{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets-debug.cmake
+%{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets-relwithdebinfo.cmake
+#%%{_libdir}/cmake/CpuFeatures/CpuFeaturesTargets-debug.cmake
 %{_libdir}/cmake/CpuFeatures/CpuFeaturesConfig.cmake
 %{_libdir}/cmake/CpuFeatures/CpuFeaturesConfigVersion.cmake
 %endif

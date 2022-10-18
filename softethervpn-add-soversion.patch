@@ -1,0 +1,40 @@
+From 8395bb39f7f5e90a32a8a45a4b0c230516f94201 Mon Sep 17 00:00:00 2001
+From: Luca Magrone <luca@magrone.cc>
+Date: Tue, 18 Oct 2022 05:34:44 +0200
+Subject: [PATCH] Add soversion to shared libraries
+
+Add soversion 0.0.0 to libmayaqua and libcedar
+
+Signed-off-by: Luca Magrone <luca@magrone.cc>
+---
+ src/Cedar/CMakeLists.txt   | 1 +
+ src/Mayaqua/CMakeLists.txt | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/src/Cedar/CMakeLists.txt b/src/Cedar/CMakeLists.txt
+index 7818d790..9fdfc383 100644
+--- a/src/Cedar/CMakeLists.txt
++++ b/src/Cedar/CMakeLists.txt
+@@ -17,6 +17,7 @@ set_target_properties(cedar
+   ARCHIVE_OUTPUT_DIRECTORY "${BUILD_DIRECTORY}"
+   LIBRARY_OUTPUT_DIRECTORY "${BUILD_DIRECTORY}"
+   RUNTIME_OUTPUT_DIRECTORY "${BUILD_DIRECTORY}"
++  SOVERSION 0.0.0
+ )
+ 
+ target_link_libraries(cedar PUBLIC mayaqua)
+diff --git a/src/Mayaqua/CMakeLists.txt b/src/Mayaqua/CMakeLists.txt
+index 534bc866..2c7f422e 100644
+--- a/src/Mayaqua/CMakeLists.txt
++++ b/src/Mayaqua/CMakeLists.txt
+@@ -14,6 +14,7 @@ set_target_properties(mayaqua
+   ARCHIVE_OUTPUT_DIRECTORY "${BUILD_DIRECTORY}"
+   LIBRARY_OUTPUT_DIRECTORY "${BUILD_DIRECTORY}"
+   RUNTIME_OUTPUT_DIRECTORY "${BUILD_DIRECTORY}"
++  SOVERSION 0.0.0
+ )
+ 
+ find_package(OpenSSL REQUIRED)
+-- 
+2.37.3
+
