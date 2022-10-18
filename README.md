@@ -1,6 +1,6 @@
 # SoftEther VPN Server Web Manager
 
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/lucamagrone27/SoftEtherVPN-Console/package/SoftEtherVPN-patternfly-sources/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/lucamagrone27/SoftEtherVPN-Console/package/SoftEtherVPN-patternfly-sources/)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/lucamagrone/SoftEtherVPN-Console/package/SoftEtherVPN-patternfly-sources/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/lucamagrone/SoftEtherVPN-Console/package/softethervpn-web-console/)
 
 This project aims to develop an HTML5 management UI for SoftEther VPN Server leveraging (by forking) the [Patternfly Seed](https://github.com/patternfly/patternfly-react-seed) and the [SoftEther VPN Server JSON-RPC API Suite](https://github.com/SoftEtherVPN/SoftEtherVPN/tree/master/developer_tools/vpnserver-jsonrpc-clients/).
 
