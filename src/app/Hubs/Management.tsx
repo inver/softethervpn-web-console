@@ -42,6 +42,8 @@ const SubsectionTitles = {
   "radius": "RADIUS",
 }
 
+const basepath = "/admin/manager"
+
 class Management extends React.Component {
   constructor(props){
     super(props);
@@ -79,6 +81,8 @@ class Management extends React.Component {
     }
   }
 
+
+
   render() {
     const { hub, subsection } = this.state;
 
@@ -88,9 +92,9 @@ class Management extends React.Component {
         <React.Fragment>
         <PageSection variant={PageSectionVariants.light}>
           <Breadcrumb>
-            <BreadcrumbItem to="#/hubs">Hubs</BreadcrumbItem>
+            <BreadcrumbItem to={basepath + "/#/hubs"}>Hubs</BreadcrumbItem>
             <BreadcrumbItem>{hub}</BreadcrumbItem>
-            <BreadcrumbItem to={"#/hubs/" + hub + "/management"} isActive>Management</BreadcrumbItem>
+            <BreadcrumbItem to={basepath + "/#/hubs/" + hub + "/management"} isActive>Management</BreadcrumbItem>
           </Breadcrumb>
         </PageSection>
         <Divider component="div" />
@@ -188,10 +192,10 @@ class Management extends React.Component {
         <React.Fragment>
         <PageSection variant={PageSectionVariants.light}>
           <Breadcrumb>
-            <BreadcrumbItem to="#/hubs">Hubs</BreadcrumbItem>
+            <BreadcrumbItem to={basepath + "/#/hubs"}>Hubs</BreadcrumbItem>
             <BreadcrumbItem>{hub}</BreadcrumbItem>
-            <BreadcrumbItem to={"#/hubs/" + hub + "/management"}>Management</BreadcrumbItem>
-            <BreadcrumbItem to={"#/hubs/" + hub + "/management/" + subsection} isActive>{SubsectionTitles[subsection]}</BreadcrumbItem>
+            <BreadcrumbItem to={basepath + "/#/hubs/" + hub + "/management"}>Management</BreadcrumbItem>
+            <BreadcrumbItem to={basepath + "/#/hubs/" + hub + "/management/" + subsection} isActive>{SubsectionTitles[subsection]}</BreadcrumbItem>
           </Breadcrumb>
         </PageSection>
         <PageSection variant={PageSectionVariants.grey}>
