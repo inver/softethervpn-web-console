@@ -79,6 +79,7 @@ BuildRequires:  patchutils
 BuildRequires:  subversion
 BuildRequires:  systemtap
 BuildRequires:  gcc-c++
+BuildRequires:  systemd-rpm-macros
 
 Source0:        {{{ git_dir_pack }}}
 Source1:        https://github.com/SoftEtherVPN/SoftEtherVPN/archive/refs/tags/%{V5_VERSION}.tar.gz
@@ -394,6 +395,21 @@ mkdir -p %{buildroot}%{_sharedstatedir}/softethervpn
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 cp -r dist/* %{buildroot}%{_sharedstatedir}/%{name}/
 %endif
+
+%post
+%systemd_post softethervpn-server.service
+%systemd_post softethervpn-bridge.service
+%systemd_post softethervpn-client.service
+
+%preun
+%systemd_preun softethervpn-server.service
+%systemd_preun softethervpn-bridge.service
+%systemd_preun softethervpn-client.service
+
+%postun
+%systemd_postun_with_restart softethervpn-server.service
+%systemd_postun_with_restart softethervpn-bridge.service
+%systemd_postun_with_restart softethervpn-client.service
 
 
 %files
