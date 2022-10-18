@@ -15,6 +15,10 @@
 %global ncpu_features s390x 
 %global nv4_arches s390x ppc64le 
 
+# Only build console package
+%bcond_with console_only
+
+%if %{without console_only}
 # For development purposes one might want to skip building the console itself
 %bcond_without console
 
@@ -28,17 +32,25 @@
 
 %if %{with v5}
 %global actual_version %{ver5}
-%global sebuild %{build5}
+%global sebuild .build%{build5}
 %else
 %global actual_version %{ver4}
-%global sebuild %{build4}
+%global sebuild .build%{build4}
 %endif
+
+%else
+# If we only build console ensure it is built
+%global with_console 1
+# The console alone cannot produce debuginfo
+%global debug_package %{nil}
+%endif
+#Console only
 
 
 ### Main package aka console
 Name:           {{{ git_dir_name }}}
-Version:        {{{ git_dir_version }}}
-Release:        4.build%{sebuild}%{?dist}
+Version:        {{{ git_dir_version lead=0.0 follow=0 }}}
+Release:        5%{?sebuild}%{?dist}
 
 Summary:        A work-in-progress PatternFly 4 web administration console for SoftEtherVPN Software
 License:        BSD-3
@@ -81,6 +93,7 @@ Patch3:         libcpu_features-shared-lib.patch
 SoftEtherVPN Patternfly web console aims to allow for easy and complete management of a SoftEtherVPN software instance directly connecting to its built-in web server.
 This package only contains the compiled javascript for this project, SoftEtherVPN software binaries are provided in separate packages and do not need this package.
 
+%if %{without console_only}
 %package -n softethervpn-common
 Summary:        An Open-Source Free Cross-platform Multi-protocol VPN Program
 License:        Apache License Version 2.0
@@ -207,7 +220,13 @@ Development headers for a cross-platform C library to retrieve CPU features (suc
 
 %endif
 
+%endif
+#Console only
+
 %prep
+%if %{with console_only}
+{{{ git_dir_setup_macro }}}
+%else
 %if %{with v5}
 {{{ git_dir_setup_macro }}} -a 1
 pushd SoftEtherVPN-%{V5_VERSION}
@@ -228,6 +247,7 @@ pushd SoftEtherVPN_Stable-%{V4_VERSION}
     %{__patch} -p1 < %PATCH1
 popd
 %endif
+%endif
 
 %build
 
@@ -237,6 +257,7 @@ npm install
 npm run build
 %endif
 
+%if %{without console_only}
 # With V5
 %if %{with v5}
 
@@ -271,7 +292,11 @@ popd
 
 %endif
 
+%endif
+#Console only
+
 %install
+%if %{without console_only}
 # With V5
 %if %{with v5}
 # Install v5 and generate units
@@ -361,6 +386,9 @@ mkdir -p %{buildroot}%{_localstatedir}/log/softethervpn
 mkdir -p %{buildroot}%{_rundir}/softethervpn
 mkdir -p %{buildroot}%{_sharedstatedir}/softethervpn
 
+%endif
+#Console only
+
 %if %{with console}
 # Install patternfly ui root
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
@@ -374,6 +402,7 @@ cp -r dist/* %{buildroot}%{_sharedstatedir}/%{name}/
 %{_sharedstatedir}/%{name}
 %endif
 
+%if %{without console_only}
 %files -n softethervpn-common
 %{_bindir}/vpncmd
 %{_sysconfdir}/softethervpn
@@ -455,7 +484,8 @@ cp -r dist/* %{buildroot}%{_sharedstatedir}/%{name}/
 %{_libexecdir}/softethervpn/vpnclient/vpnclient
 %{_libexecdir}/softethervpn/vpnclient/hamcore.se2
 %{_unitdir}/softethervpn-client.service
-
+%endif
+#Console only
 
 %changelog
 {{{ git_dir_changelog }}}
