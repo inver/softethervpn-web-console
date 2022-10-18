@@ -259,10 +259,8 @@ mkdir SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 cp -r dist/* SoftEtherVPN_Stable-%{V4_VERSION}/%{console_path}
 %endif
 pushd SoftEtherVPN_Stable-%{V4_VERSION}
-    # Remove -pipe flag because the compiler needs to create temporary files
-    export CFLAGS=$( echo $CFLAGS | sed 's/-pipe //' )
     %configure
-    %make_build
+    %make_build -e
 popd
 
 %endif

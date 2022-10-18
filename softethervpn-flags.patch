@@ -1,87 +1,50 @@
-From 0c95d6cedfdc4bccbad0fcd1309ce630ebdb04be Mon Sep 17 00:00:00 2001
-From: Luca Magrone <luca@magrone.cc>
-Date: Tue, 18 Oct 2022 00:41:11 +0200
-Subject: [PATCH 1/2] Build with rpm CFLAGS
-
-The makefile does not use a standard configure script so the CFLAGS variable
-must be added to OPTIONS_COMPILE_DEBUG options list
-
-Signed-off-by: Luca Magrone <luca@magrone.cc>
----
- src/makefiles/linux_64bit.mak | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
 diff --git a/src/makefiles/linux_64bit.mak b/src/makefiles/linux_64bit.mak
-index 02f67e98..218d3833 100644
+index 02f67e98..df237599 100644
 --- a/src/makefiles/linux_64bit.mak
 +++ b/src/makefiles/linux_64bit.mak
-@@ -62,7 +62,7 @@
+@@ -62,13 +62,16 @@
  
  #CC=gcc
  
 -OPTIONS_COMPILE_DEBUG=-D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -g -fsigned-char -m64
-+OPTIONS_COMPILE_DEBUG=${CFLAGS} -D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -g -fsigned-char -m64
- 
- OPTIONS_LINK_DEBUG=-g -fsigned-char -m64 -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
- 
--- 
-2.37.3
-
-
-From fe1a93e69d50af993b37d6cde9004f8c7af8b23f Mon Sep 17 00:00:00 2001
-From: Luca Magrone <luca@magrone.cc>
-Date: Tue, 18 Oct 2022 01:26:15 +0200
-Subject: [PATCH 2/2] Add flags in all makefiles variants needed
-
-Add flags to every custom variable that holds the flags
-
-Signed-off-by: Luca Magrone <luca@magrone.cc>
----
- src/makefiles/linux_64bit.mak        | 6 +++---
- src/makefiles/linux_64bit_nobits.mak | 8 ++++----
- 2 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/src/makefiles/linux_64bit.mak b/src/makefiles/linux_64bit.mak
-index 218d3833..68558ba0 100644
---- a/src/makefiles/linux_64bit.mak
-+++ b/src/makefiles/linux_64bit.mak
-@@ -64,11 +64,11 @@
- 
- OPTIONS_COMPILE_DEBUG=${CFLAGS} -D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -g -fsigned-char -m64
++CFLAGS=
++LDFLAGS=
  
 -OPTIONS_LINK_DEBUG=-g -fsigned-char -m64 -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
-+OPTIONS_LINK_DEBUG=${LDFLAGS} -g -fsigned-char -m64 -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
++OPTIONS_COMPILE_DEBUG=$(CFLAGS) -D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -g -fsigned-char -m64
  
 -OPTIONS_COMPILE_RELEASE=-DNDEBUG -DVPN_SPEED -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -O2 -fsigned-char -m64
-+OPTIONS_COMPILE_RELEASE=${CFLAGS} -DNDEBUG -DVPN_SPEED -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -O2 -fsigned-char -m64
++OPTIONS_LINK_DEBUG=$(LDFLAGS) -g -fsigned-char -m64 -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
  
 -OPTIONS_LINK_RELEASE=-O2 -fsigned-char -m64 -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
-+OPTIONS_LINK_RELEASE=${LD_FLAGS} -O2 -fsigned-char -m64 -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
++OPTIONS_COMPILE_RELEASE=$(CFLAGS) -DNDEBUG -DVPN_SPEED -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -O2 -fsigned-char -m64
++
++OPTIONS_LINK_RELEASE=$(LDFLAGS) -O2 -fsigned-char -m64 -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
  
  INSTALL_BINDIR=/usr/bin/
  INSTALL_VPNSERVER_DIR=/usr/vpnserver/
 diff --git a/src/makefiles/linux_64bit_nobits.mak b/src/makefiles/linux_64bit_nobits.mak
-index 9a478248..3a2aabb2 100644
+index 9a478248..11c1b7f6 100644
 --- a/src/makefiles/linux_64bit_nobits.mak
 +++ b/src/makefiles/linux_64bit_nobits.mak
-@@ -62,13 +62,13 @@
+@@ -62,13 +62,16 @@
  
  #CC=gcc
  
 -OPTIONS_COMPILE_DEBUG=-D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -g -fsigned-char
-+OPTIONS_COMPILE_DEBUG=${CFLAGS} -D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -g -fsigned-char
++CFLAGS=
++LDFLAGS=
  
 -OPTIONS_LINK_DEBUG=-g -fsigned-char -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
-+OPTIONS_LINK_DEBUG=${LDFLAGS} -g -fsigned-char -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
++OPTIONS_COMPILE_DEBUG=$(CFLAGS) -D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -g -fsigned-char
  
 -OPTIONS_COMPILE_RELEASE=-DNDEBUG -DVPN_SPEED -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -O2 -fsigned-char
-+OPTIONS_COMPILE_RELEASE=${CLFAGS} -DNDEBUG -DVPN_SPEED -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -O2 -fsigned-char
++OPTIONS_LINK_DEBUG=$(LDFLAGS) -g -fsigned-char -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
  
 -OPTIONS_LINK_RELEASE=-O2 -fsigned-char -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
-+OPTIONS_LINK_RELEASE=${LDFLAGS} -O2 -fsigned-char -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
++OPTIONS_COMPILE_RELEASE=$(CFLAGS) -DNDEBUG -DVPN_SPEED -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./src/ -I./src/Cedar/ -I./src/Mayaqua/ -O2 -fsigned-char
++
++OPTIONS_LINK_RELEASE=$(LDFLAGS) -O2 -fsigned-char -lm -ldl -lrt -lpthread -lssl -lcrypto -lreadline -lncurses -lz
  
  INSTALL_BINDIR=/usr/bin/
  INSTALL_VPNSERVER_DIR=/usr/vpnserver/
--- 
-2.37.3
-
