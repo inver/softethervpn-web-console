@@ -53,7 +53,7 @@
 ### Main package aka console
 Name:           {{{ git_dir_name }}}
 Version:        {{{ git_dir_version lead=0.0 follow=0 }}}
-Release:        5%{?sebuild}%{?dist}
+Release:        6%{?sebuild}%{?dist}
 
 Summary:        A work-in-progress PatternFly 4 web administration console for SoftEtherVPN Software
 License:        BSD-3
