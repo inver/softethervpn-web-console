@@ -94,6 +94,7 @@ Patch0:         softethervpn-flags.patch
 Patch1:         softethervpn-paths.patch
 Patch2:         softethervpn-add-soversion.patch
 Patch3:         libcpu_features-shared-lib.patch
+Patch4:         softethervpn-fix-implicit-declaration.patch
 
 %description
 SoftEtherVPN Patternfly web console aims to allow for easy and complete management of a SoftEtherVPN software instance directly connecting to its built-in web server.
@@ -251,6 +252,7 @@ popd
 pushd SoftEtherVPN_Stable-%{V4_VERSION}
     %{__patch} -p1 < %PATCH0
     %{__patch} -p1 < %PATCH1
+    %{__patch} -p1 < %PATCH4
 popd
 %endif
 %endif

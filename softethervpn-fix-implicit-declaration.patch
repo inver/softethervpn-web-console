@@ -1,0 +1,66 @@
+From 180b47e47cc3d5dad12a0637debd1eaa2a2fd933 Mon Sep 17 00:00:00 2001
+From: Davide Beatrici <davidebeatrici@gmail.com>
+Date: Fri, 10 Aug 2018 21:21:19 +0200
+Subject: [PATCH 1/2] VLanUnix: fix "implicit declaration of function
+ 'FreeTap'" warning
+
+In file included from /builds/SoftEther/SoftEtherVPN/src/Cedar/Bridge.c:130:0:
+/builds/SoftEther/SoftEtherVPN/src/Cedar/BridgeUnix.c: In function 'CloseEth':
+/builds/SoftEther/SoftEtherVPN/src/Cedar/BridgeUnix.c:1568:3: warning: implicit declaration of function 'FreeTap'; did you mean 'FreeCaps'? [-Wimplicit-function-declaration]
+   FreeTap(e->Tap);
+   ^~~~~~~
+   FreeCaps
+---
+ src/Cedar/VLanUnix.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/Cedar/VLanUnix.h b/src/Cedar/VLanUnix.h
+index fa878e59..556aecda 100644
+--- a/src/Cedar/VLanUnix.h
++++ b/src/Cedar/VLanUnix.h
+@@ -122,6 +122,7 @@ struct VLAN
+ VLAN *NewVLan(char *instance_name, VLAN_PARAM *param);
+ VLAN *NewTap(char *name, char *mac_address);
+ void FreeVLan(VLAN *v);
++void FreeTap(VLAN *v);
+ CANCEL *VLanGetCancel(VLAN *v);
+ bool VLanGetNextPacket(VLAN *v, void **buf, UINT *size);
+ bool VLanPutPacket(VLAN *v, void *buf, UINT size);
+-- 
+2.39.3
+
+
+From b4c8fa99be440db233a21df761d6ac1dff6a8f75 Mon Sep 17 00:00:00 2001
+From: Davide Beatrici <davidebeatrici@gmail.com>
+Date: Fri, 10 Aug 2018 21:22:36 +0200
+Subject: [PATCH 2/2] Console.c: fix "implicit declaration of function 'getch'"
+ warning
+
+/builds/SoftEther/SoftEtherVPN/src/Cedar/Console.c: In function 'PasswordPrompt':
+/builds/SoftEther/SoftEtherVPN/src/Cedar/Console.c:2051:8: warning: implicit declaration of function 'getch'; did you mean 'getc'? [-Wimplicit-function-declaration]
+    c = getch();
+        ^~~~~
+        getc
+---
+ src/Cedar/Console.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/Cedar/Console.c b/src/Cedar/Console.c
+index 3c6c90c2..e9087491 100644
+--- a/src/Cedar/Console.c
++++ b/src/Cedar/Console.c
+@@ -2039,7 +2039,11 @@ bool PasswordPrompt(char *password, UINT size)
+ 		else if (c == 0xE0)
+ 		{
+ 			// Read one more character
++#ifdef OS_WIN32
+ 			c = getch();
++#else  // OS_WIN32
++			c = getc(stdin);
++#endif // OS_WIN32
+ 			if (c == 0x4B || c == 0x53)
+ 			{
+ 				// Backspace
+-- 
+2.39.3
+
