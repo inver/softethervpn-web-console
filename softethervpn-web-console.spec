@@ -1,5 +1,5 @@
 %global V5_VERSION 5.02.5180
-%global V4_VERSION 4.41-9782-beta
+%global V4_VERSION 4.43-9799-beta
 
 %global ver5 %(echo "%{V5_VERSION}" | cut -d"." -f 1,2)
 %global ver4 %(echo "%{V4_VERSION}" | cut -d"-" -f 1)
@@ -53,7 +53,7 @@
 ### Main package aka console
 Name:           {{{ git_dir_name }}}
 Version:        {{{ git_dir_version lead=0.0 follow=0 }}}
-Release:        7%{?sebuild}%{?dist}
+Release:        8%{?sebuild}%{?dist}
 
 Summary:        A work-in-progress PatternFly 4 web administration console for SoftEtherVPN Software
 License:        BSD-3
