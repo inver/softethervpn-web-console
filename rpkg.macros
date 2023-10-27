@@ -1,0 +1,9 @@
+function get_lead() {
+	ver=$(cat package.json | grep version | cut -d"\"" -f 4)
+	echo "${ver:0:-2}"
+}
+
+function get_follow() {
+	ver=$(cat package.json | grep version | cut -d"\"" -f 4)
+	echo "${ver:4}"
+}

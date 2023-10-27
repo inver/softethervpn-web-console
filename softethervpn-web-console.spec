@@ -49,10 +49,12 @@
 %endif
 #Console only
 
+%global lead {{{ get_lead }}}
+%global follow {{{ get_follow }}}
 
 ### Main package aka console
 Name:           {{{ git_dir_name }}}
-Version:        {{{ git_dir_version lead=0.0 follow=0 }}}
+Version:        {{{ git_dir_version lead=%{lead} follow=%{follow} }}}
 Release:        8%{?sebuild}%{?dist}
 
 Summary:        A work-in-progress PatternFly 4 web administration console for SoftEtherVPN Software
