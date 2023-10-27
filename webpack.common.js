@@ -135,7 +135,7 @@ module.exports = env => {
       ],
       symlinks: false,
       cacheWithContext: false,
-      fallback: { "https": require.resolve("https-browserify"), "http": require.resolve("stream-http"), "path": require.resolve("path-browserify"), "crypto": require.resolve("crypto-browserify"), "stream": require.resolve("stream-browserify") }
+      fallback: { "https": require.resolve("https-browserify"), "http": require.resolve("stream-http"), "path": require.resolve("path-browserify"), "crypto": require.resolve("crypto-browserify"), "stream": require.resolve("stream-browserify"), "url": require.resolve("url"), "buffer": require.resolve("buffer") }
     }
   }
 };
