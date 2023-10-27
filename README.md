@@ -42,11 +42,6 @@ npm run bundle-profile:analyze
 # Start the express server (run a production build first)
 npm run start
 
-# Start storybook component explorer
-npm run storybook
-
-# Build storybook component explorer as standalone app (outputs to "storybook-static" dir)
-npm run build:storybook
 ```
 ## Installing the web UI
 It is possible to try this UI by running ``` npm run build ``` and copying the content of the ``` dist ``` folder into ``` src/bin/hamcore/wwwroot/admin/manager ```, which has to be created inside a previously cloned SoftEtherVPN source code and by compliling it.
@@ -98,7 +93,6 @@ When importing CSS from a third-party package for the first time, you may encoun
 * To keep our code formatting in check, we use [prettier](https://github.com/prettier/prettier)
 * To keep our code logic and test coverage in check, we use [jest](https://github.com/facebook/jest)
 * To ensure code styles remain consistent, we use [eslint](https://eslint.org/)
-* To provide a place to showcase custom components, we integrate with [storybook](https://storybook.js.org/)
 
 ## Multi environment configuration
 This project uses [dotenv-webpack](https://www.npmjs.com/package/dotenv-webpack) for exposing environment variables to your code. Either export them at the system level like `export MY_ENV_VAR=http://dev.myendpoint.com && npm run start:dev` or simply drop a `.env` file in the root that contains your key-value pairs like below:
