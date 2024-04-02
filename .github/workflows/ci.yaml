@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: version
-        run: echo "::set-output name=version::$(./bin/azblogfilter --version)"
+        run: echo "::set-output name=version::$(cat package.json | jq -r '.version')"
         id: version
       - name: release
         uses: actions/create-release@v1
