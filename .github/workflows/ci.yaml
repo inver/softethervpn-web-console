@@ -4,6 +4,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@master
       - name: version
         run: echo "::set-output name=version::$(cat package.json | jq -r '.version')"
         id: version
@@ -18,7 +19,6 @@ jobs:
           body_path: CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      - uses: actions/checkout@master
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
