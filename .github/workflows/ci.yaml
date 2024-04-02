@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: version
-        run: echo "version=$(cat package.json | jq -r '.version')" >> $GITHUB_STATE
+        run: echo "version=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
         id: version
       - name: release
         uses: actions/create-release@v1
