@@ -1,0 +1,1 @@
+- Added github ci script for creating production build and publish release
