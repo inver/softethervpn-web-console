@@ -1,0 +1,44 @@
+name: Create Archive
+on: [ push ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: version
+        run: echo "::set-output name=version::$(./bin/azblogfilter --version)"
+        id: version
+      - name: release
+        uses: actions/create-release@v1
+        id: create_release
+        with:
+          draft: false
+          prerelease: false
+          release_name: ${{ steps.version.outputs.version }}
+          tag_name: ${{ github.ref }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/checkout@master
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16.x'
+      - name: Install dependencies
+        run: npm install
+      - name: Build front
+        run: npm run build
+      - name: Archive Release
+        uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          filename: '${{ steps.version.outputs.version }}.zip'
+          path: 'dist'
+      - name: upload linux artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./${{ steps.version.outputs.version }}.zip
+          asset_name: web-console-${{ steps.version.outputs.version }}.zip
+          asset_content_type: application/zip
