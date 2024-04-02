@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: version
-        run: echo "::set-output name=version::$(cat package.json | jq -r '.version')"
+        run: echo "version=$(cat package.json | jq -r '.version')" >> $GITHUB_STATE
         id: version
       - name: release
         uses: actions/create-release@v1
